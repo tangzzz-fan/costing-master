@@ -4,6 +4,8 @@
 
 本项目不是定额库、算量软件或签章工具，而是一个“知识参考 + 文件审核工作流辅助”的 Skill：帮助造价人员从 Excel、PDF、Word、签证单、结算书、材料价格表等资料中抽取关键信息，形成可复核的台账、报告和需补资料清单。
 
+默认服务地区：江苏苏州。项目工作模式下优先使用苏州市/江苏省现行计价依据，其次上海市、浙江省等江浙沪地区文件；跨地区项目以项目所在地文件和合同为准。
+
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-orange)](https://claude.ai/code)
 [![Standard](https://img.shields.io/badge/GB%2FT%2050500--2024-red)](https://ebook.chinabuilding.com.cn/zbooklib/book/detail/show?SiteID=1&bookID=155858)
@@ -67,7 +69,10 @@ costing-master/
 ├── SKILL.md
 ├── README.md
 ├── CHANGELOG.md
+├── ROADMAP.md
 ├── references/
+│   ├── standards-index.md
+│   ├── region-jiangsu-shanghai-zhejiang.md
 │   ├── gbt50500-2024.md
 │   ├── boq-and-pricing.md
 │   ├── boq-check-rules.md
@@ -106,6 +111,8 @@ costing-master/
 ## 建议上传的地区资料
 
 - 项目所在地最新工程造价信息、材料信息价、人工费指导价、机械台班价。
+- 江苏/苏州项目：苏州市工程造价信息、江苏省 2026 版消耗量指标/费用参考、苏州建函建〔2026〕72号。
+- 上海、浙江项目：当地 2025 版计价规则/计价依据和当期信息价。
 - 当地现行计价定额、费用定额、取费文件、地方补充清单规则。
 - 招标文件、合同文件、工程量清单、设计说明、答疑澄清。
 - 企业历史项目成本数据、已标价工程量清单、综合单价分析表、供应商询价记录。
@@ -157,13 +164,16 @@ python3 scripts/validate.py
 ## 适用依据
 
 - GB/T 50500-2024《建设工程工程量清单计价标准》
+- 苏州市/江苏省现行计价依据、费用文件和造价信息；上海市、浙江省文件按项目所在地适用
 - 项目所在地现行建设工程计价依据、费用文件和造价信息
 - 项目合同、招标文件、答疑澄清、补充协议
 - GF-2017-0201《建设工程施工合同（示范文本）》仅作参考，具体以项目合同约定为准
 
+标准、法规和计价依据的版本、来源与核对状态见 `references/standards-index.md`。
+
 ## 版本路线
 
-当前版本：v0.4.1（详见 `CHANGELOG.md`）。
+当前版本：v0.4.2（详见 `CHANGELOG.md`）。v0.4.2 至 v1.0.0 的详细计划见 `ROADMAP.md`。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -172,6 +182,7 @@ python3 scripts/validate.py
 | v0.3 | 已发布 | 定额换算、进度款审核、算量指标反查、新旧标准混用检查 |
 | v0.4 | 已发布 | DWG/CAD 处理、市场询价降级、二次审核量化、大型 BOQ 处理策略 |
 | v0.4.1 | 已发布 | 2024 版费用口径修正、测试覆盖、示例、CI 和 emoji 禁用校验 |
+| v0.4.2 | 已提交，待审核 | 标准、法规与计价依据索引；江浙沪地区资料；更新流程和人工审核清单 |
 | v0.5 | 规划 | 成本管理增强：目标成本、动态成本、偏差分析 |
 | v1.0 | 规划 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
 
