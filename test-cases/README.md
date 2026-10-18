@@ -31,3 +31,4 @@
 - 修改 workflow、template、reference 或 SKILL.md 后，至少回归本矩阵中受影响的用例。
 - 新增 workflow 时，必须同时新增至少一个 `test-cases/*.case.md` 并在本表登记。
 - 校验脚本 `scripts/validate.py` 会检查本表是否覆盖全部 `workflows/*.md`。
+- 苏州地铁场景的确定性计算由 `scripts/test_scenarios.py` 自动断言；证据分级、结论强度等语义判断仍按用例人工验收。

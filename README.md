@@ -158,9 +158,12 @@ git clone https://github.com/jayden-lg/costing-master.git ~/.claude/skills/costi
 
 ```bash
 python3 scripts/validate.py
+python3 scripts/test_scenarios.py
 ```
 
-校验内容包括：SKILL.md frontmatter、相对路径和链接、README 目录树、workflow 测试用例覆盖、markdown 表格一致性、重复标题和 emoji 禁用规则。GitHub Actions 在 push 和 pull request 时自动运行。
+`validate.py` 检查 SKILL.md frontmatter、相对路径和链接、README 目录树、workflow 测试用例覆盖、markdown 表格一致性、重复标题和 emoji 禁用规则。
+
+`test_scenarios.py` 执行苏州地铁 VIII-TS-08 场景的确定性业务断言，包括进度款扣回、材料调差、结算组成差异和问题分类。GitHub Actions 在 push 和 pull request 时自动运行两步。
 
 仓库约定：正文和模板不使用 emoji 图标；状态标记使用 `[警告]`、`[通过]` 等文字。
 
@@ -176,7 +179,7 @@ python3 scripts/validate.py
 
 ## 版本路线
 
-当前版本：v0.7.0（详见 `CHANGELOG.md`）。v0.7.0 至 v1.0.0 的详细计划见 `ROADMAP.md`。
+当前版本：v0.7.1（详见 `CHANGELOG.md`）。v0.7.1 至 v1.0.0 的详细计划见 `ROADMAP.md`。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -189,6 +192,7 @@ python3 scripts/validate.py
 | v0.5 | 已发布 | 成本管理增强：目标成本、动态成本、偏差分析、管理层摘要 |
 | v0.6 | 已发布 | 计价、投标报价与清标分析工作流 |
 | v0.7 | 已发布 | 江浙沪地区资料包；地铁车站/盾构专项审核；版本门控 |
+| v0.7.1 | 已发布 | 苏州地铁 CI 业务测试：进度款、材料调差、结算差异自动断言 |
 | v1.0 | 规划 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
 
 ## 免责声明

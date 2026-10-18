@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.7.1 — 2026-10-18
+
+- 新增 `scripts/test_scenarios.py`：苏州地铁场景确定性业务断言，覆盖进度款扣回、材料调差、结算组成差异和问题分类
+- 新增 `test-cases/fixtures/suzhou-metro-viii-ts-08/scenario.json`：机器可读测试数据
+- CI 增加业务断言步骤，结构校验和业务断言分开执行
+- README 和测试用例索引补充自动化测试说明
+
 ## v0.7.0 — 2026-10-18
 
 - 新增 `references/metro-rail-transit.md`：地铁车站/盾构清单特征、合同风险、变更索赔、材料调差、进度/结算和江浙沪计价依据

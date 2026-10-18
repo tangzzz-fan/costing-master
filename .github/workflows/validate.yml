@@ -18,3 +18,5 @@ jobs:
           python-version: "3.12"
       - name: Validate skill structure and markdown
         run: python3 scripts/validate.py
+      - name: Run Suzhou metro scenario business assertions
+        run: python3 scripts/test_scenarios.py

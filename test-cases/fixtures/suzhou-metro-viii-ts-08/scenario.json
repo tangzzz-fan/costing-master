@@ -1,0 +1,101 @@
+{
+  "project": {
+    "name": "苏州市轨道交通8号线工程土建施工项目（第三批）VIII-TS-08标",
+    "contract_amount": 934771363.61,
+    "contract_days": 1507,
+    "source": "https://ggzy.suzhou.gov.cn/jyxx/003001/003001031/20260129/f8e70ee1-5c67-482a-997c-7e9c289e1e26.html"
+  },
+  "progress_payment": {
+    "reported_completed": 80000000,
+    "unconfirmed_visa": 2000000,
+    "payment_ratio": 0.8,
+    "cumulative_completed": 300000000,
+    "advance_threshold_ratio": 0.3,
+    "advance_deduction_ratio": 0.2,
+    "retention_ratio": 0.03,
+    "advance_total": 93477136.36,
+    "expected": {
+      "approved_value": 78000000,
+      "current_payment": 62400000,
+      "advance_threshold": 280431409.08,
+      "advance_deduction": 12480000,
+      "retention": 1872000,
+      "net_payment": 48048000
+    }
+  },
+  "material_adjustment": {
+    "claimed_amount": 20000000,
+    "items": [
+      {
+        "name": "螺纹钢",
+        "spec": "HRB400 Φ16-25",
+        "quantity": 6500,
+        "base_price": 4000,
+        "current_price": 4500,
+        "risk_ratio": 0.05,
+        "expected_unit": 300,
+        "expected_amount": 1950000
+      },
+      {
+        "name": "商品混凝土",
+        "spec": "C40",
+        "quantity": 28000,
+        "base_price": 500,
+        "current_price": 540,
+        "risk_ratio": 0.05,
+        "expected_unit": 15,
+        "expected_amount": 420000
+      }
+    ],
+    "expected_supported_total": 2370000,
+    "expected_gap": 17630000
+  },
+  "settlement": {
+    "reported_total": 1050000000,
+    "components": {
+      "contract": 934771363.61,
+      "changes": 60000000,
+      "material_adjustment": 20000000,
+      "claims": 10000000
+    },
+    "expected_component_sum": 1024771363.61,
+    "expected_difference": 25228636.39,
+    "issues": [
+      {
+        "id": "S-01",
+        "type": "suspected_duplicate",
+        "amount": 500000
+      },
+      {
+        "id": "S-02",
+        "type": "pending_evidence",
+        "amount": 300000
+      },
+      {
+        "id": "S-03",
+        "type": "unsupported_adjustment",
+        "amount": 17630000
+      },
+      {
+        "id": "S-04",
+        "type": "pending_evidence",
+        "amount": 10000000
+      },
+      {
+        "id": "S-05",
+        "type": "certain_arithmetic",
+        "amount": 25228636.39
+      },
+      {
+        "id": "S-06",
+        "type": "pending_retention",
+        "amount": null
+      },
+      {
+        "id": "S-07",
+        "type": "boq_feature_gap",
+        "amount": null
+      }
+    ]
+  }
+}
