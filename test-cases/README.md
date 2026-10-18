@@ -23,6 +23,7 @@
 |---|---|---|
 | 新旧标准混用 | `test-cases/standard-transition.case.md` | 合同约定优先、地方过渡文件、软件模板 |
 | 综合单价分析 | `test-cases/unit-price-analysis.case.md` | 套项思路、清单量/定额量、缺资料时不报确定单价 |
+| 苏州地铁车站土建结算 | `test-cases/suzhou-metro-station.case.md` | 地铁车站/盾构、变更签证、材料调差、进度款、结算审核、地区资料 |
 
 ## 回归约定
 
