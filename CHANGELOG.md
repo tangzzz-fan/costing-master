@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.11.0 — 2026-10-18
+
+- 新增 `references/excel-output-guide.md`：Excel 适用场景、工作簿结构、公式规范、证据列、数据验证和签认边界
+- 新增 `templates/excel/`：8 个 Excel 兼容 CSV 表头模板（清单、报价、调差、进度款、结算台账、成本偏差、证据索引、综合单价）
+- 新增 `test-cases/excel-output.case.md`：使用苏州地铁公开项目框架和现有证据验证 Excel 输出实践
+- `scripts/validate.py` 增加 Excel CSV 模板存在性、UTF-8 BOM 和表头检查
+- SKILL/README/CAPABILITIES/测试矩阵同步
+- bump version 0.11.0
+
 ## v0.10.0 — 2026-10-18
 
 - 新增 `references/enterprise-delivery.md`：角色分离、交付物清单、G1-G6 审核 gate、审计轨迹、版本兼容、保密与归档

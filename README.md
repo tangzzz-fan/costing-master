@@ -35,6 +35,7 @@
 | 轨道交通/地铁车站与盾构 | 清单特征检查表、变更索赔证据清单、进度款/结算审核 |
 | 资料抽取与证据链 | 证据索引、资料完整性清单、需补资料、OCR/版本风险提示 |
 | 企业级交付 | 交付包、审核记录、审计轨迹、签认边界、归档清单 |
+| Excel 输出 | 多 sheet 工作簿结构、公式、证据列、判断等级和台账模板 |
 
 ## 不能做什么
 
@@ -83,6 +84,7 @@ costing-master/
 │   ├── file-extraction-and-evidence.md
 │   ├── evaluation-and-regression.md
 │   ├── enterprise-delivery.md
+│   ├── excel-output-guide.md
 │   ├── gbt50500-2024.md
 │   ├── boq-and-pricing.md
 │   ├── boq-check-rules.md
@@ -171,7 +173,7 @@ python3 scripts/test_standard_change.py
 python3 scripts/eval_workflows.py
 ```
 
-`validate.py` 检查 SKILL.md frontmatter、相对路径和链接、README 目录树、workflow 测试用例覆盖、markdown 表格一致性、重复标题、测试用例数据来源和 emoji 禁用规则。
+`validate.py` 检查 SKILL.md frontmatter、相对路径和链接、README 目录树、workflow 测试用例覆盖、markdown 表格一致性、重复标题、测试用例数据来源、Excel CSV 模板表头/BOM 和 emoji 禁用规则。
 
 `test_scenarios.py` 执行苏州地铁 VIII-TS-08 场景的确定性业务断言，包括进度款扣回、材料调差、结算组成差异和问题分类。
 
@@ -193,7 +195,7 @@ python3 scripts/eval_workflows.py
 
 ## 版本路线
 
-当前版本：v0.10.0（详见 `CHANGELOG.md`）。v0.10.0 至 v1.0.0 的详细计划见 `ROADMAP.md`。
+当前版本：v0.11.0（详见 `CHANGELOG.md`）。v0.11.0 至 v1.0.0 的详细计划见 `ROADMAP.md`。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -212,6 +214,7 @@ python3 scripts/eval_workflows.py
 | v0.9.1 | 已发布 | 标准变动回归：标准新鲜度、影响矩阵和标准变动测试 |
 | v0.9.2 | 已发布 | 苏州/浙江标准变动实际场景测试：旧版/新版适用性断言 |
 | v0.10 | 已发布 | 企业级交付：角色分离、交付包、审核记录、审计轨迹和归档 |
+| v0.11 | 已发布 | Excel 输出实践：工作簿结构、公式、证据列和 CSV 模板 |
 | v1.0 | 规划 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
 
 ## 免责声明

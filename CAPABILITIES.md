@@ -41,6 +41,7 @@
 | 新旧标准混用检查 | 2013/2024 混用、地方过渡 | `references/standard-transition-check.md`、`test-cases/standard-change.case.md` | 已实现 |
 | 质量评估与回归 | 覆盖率、数据来源、CI 四步、质量报告 | `references/evaluation-and-regression.md`、`scripts/eval_workflows.py`、`templates/quality-report.md` | 已实现 |
 | 企业级交付 | 角色分离、交付包、审核记录、审计轨迹、签认边界、归档 | `workflows/enterprise-delivery.md`、`references/enterprise-delivery.md`、`templates/delivery-package.md`、`templates/review-record.md` | 已实现 |
+| Excel 输出 | 多 sheet 工作簿、公式、证据列、判断等级、台账模板 | `references/excel-output-guide.md`、`templates/excel/README.md` | 已实现 |
 
 ## 三、不适用与边界
 

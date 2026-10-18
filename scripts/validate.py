@@ -12,11 +12,13 @@ Checks:
 - every test case is listed and has expected/failure sections
 - markdown tables have consistent column counts and no duplicate headings
 - code fences are balanced
+- Excel CSV templates exist with the expected UTF-8 BOM and headers
 - no emoji icons in repository text files
 """
 
 from __future__ import annotations
 
+import csv
 import re
 import sys
 from pathlib import Path
@@ -30,6 +32,40 @@ EMOJI_PATTERN = re.compile(
     + chr(0x2B00) + "-" + chr(0x2BFF)
     + chr(0xFE0F) + "]"
 )
+
+EXCEL_HEADERS = {
+    "boq-feature-check.csv": [
+        "序号", "清单编码", "项目名称", "单位", "项目特征摘要",
+        "缺失/异常字段", "影响", "建议补充内容", "依据来源", "判断等级",
+    ],
+    "bid-price-analysis.csv": [
+        "序号", "清单编码", "项目名称", "单位", "工程量", "投标单价",
+        "评标基准/控制价单价", "单价偏离度", "合价", "合价占比",
+        "风险类型", "判断等级",
+    ],
+    "material-price-adjustment.csv": [
+        "序号", "材料名称", "规格", "单位", "调差数量", "基准期价",
+        "施工期价", "风险幅度", "可调单价", "调差金额", "价格来源", "判断等级",
+    ],
+    "progress-payment-audit.csv": ["项目", "金额(元)", "依据", "说明"],
+    "settlement-deduction-register.csv": [
+        "序号", "单位工程/专业", "清单编码/签证编号", "问题类型",
+        "报审金额(元)", "建议调整金额(元)", "调整方向", "依据来源",
+        "判断等级", "需补资料/人工确认",
+    ],
+    "cost-variance-analysis.csv": [
+        "序号", "成本科目/专业", "目标成本(元)", "动态成本(元)",
+        "偏差金额(元)", "偏差比例", "偏差类型", "原因", "判断等级",
+        "建议动作", "责任人",
+    ],
+    "evidence-index.csv": [
+        "证据编号", "文件名", "类型/版本", "页码/行号/工作表",
+        "关键事实", "关联问题", "可靠性", "缺失/备注",
+    ],
+    "comprehensive-unit-price.csv": [
+        "序号", "费用名称", "计算基数", "费率/单价", "金额(元)", "备注",
+    ],
+}
 
 
 def rel(path: Path) -> str:
@@ -217,8 +253,38 @@ def check_test_coverage() -> None:
             ERRORS.append(f"{rel(path)}: missing '## 失败表现'")
 
 
+def check_excel_templates() -> None:
+    folder = ROOT / "templates" / "excel"
+    for name, expected in EXCEL_HEADERS.items():
+        path = folder / name
+        if not path.exists():
+            ERRORS.append(f"missing Excel template: {rel(path)}")
+            continue
+        raw = path.read_bytes()
+        if not raw.startswith(b"\xef\xbb\xbf"):
+            ERRORS.append(f"{rel(path)}: missing UTF-8 BOM")
+        try:
+            with path.open(encoding="utf-8-sig", newline="") as handle:
+                rows = list(csv.reader(handle))
+        except OSError as exc:
+            ERRORS.append(f"{rel(path)}: cannot read ({exc})")
+            continue
+        if not rows:
+            ERRORS.append(f"{rel(path)}: empty template")
+            continue
+        header = rows[0]
+        if header != expected:
+            ERRORS.append(
+                f"{rel(path)}: header mismatch: got {header}, expected {expected}"
+            )
+        if any(not cell.strip() for cell in header):
+            ERRORS.append(f"{rel(path)}: blank header cell")
+        if len(header) != len(set(header)):
+            ERRORS.append(f"{rel(path)}: duplicate header cell")
+
+
 def check_no_emoji() -> None:
-    suffixes = {".md", ".yml", ".yaml", ".py", ".json"}
+    suffixes = {".md", ".yml", ".yaml", ".py", ".json", ".csv"}
     for path in sorted(ROOT.rglob("*")):
         if (
             not path.is_file()
@@ -280,6 +346,7 @@ def main() -> int:
     check_readme_tree()
     check_test_coverage()
     check_markdown()
+    check_excel_templates()
     check_no_emoji()
 
     if ERRORS:
@@ -288,7 +355,10 @@ def main() -> int:
             print(f"  - {error}")
         return 1
 
-    print(f"OK: validated {len(markdown_files())} markdown files")
+    print(
+        f"OK: validated {len(markdown_files())} markdown files "
+        f"and {len(EXCEL_HEADERS)} Excel templates"
+    )
     return 0
 
 

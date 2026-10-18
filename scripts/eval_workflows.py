@@ -181,6 +181,7 @@ def main() -> int:
     references = markdown_files("references")
     templates = markdown_files("templates")
     input_specs = markdown_files("input-specs")
+    excel_templates = sorted((ROOT / "templates" / "excel").glob("*.csv"))
     scenarios = sorted((ROOT / "test-cases").glob("fixtures/**/scenario.json"))
 
     listed_workflows = set(re.findall(r"`workflows/([^`]+\.md)`", matrix))
@@ -257,6 +258,7 @@ def main() -> int:
         f"| References | {len(references)} |",
         f"| Templates | {len(templates)} |",
         f"| Input specs | {len(input_specs)} |",
+        f"| Excel CSV templates | {len(excel_templates)} |",
         f"| Scenario JSON golden cases | {len(scenarios)} |",
         "",
         "## Coverage",
