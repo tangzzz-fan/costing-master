@@ -10,7 +10,7 @@ description: |
   组价、算量指标、新旧标准混用、目标成本。
   不用于海外计价规则、国际合同范本、非造价维度法律解释，且不替代签章、评标或法律意见。
 metadata:
-  version: "0.4.2"
+  version: "0.5.0"
 ---
 
 # 造价大师 Costing Master
@@ -102,8 +102,8 @@ metadata:
 | 分析材料价差、信息价、询价 | `workflows/material-price-analysis.md` |
 | 审核进度款、预付款扣回、质保金 | `workflows/progress-payment-audit.md` |
 | 用含量指标反查 GTJ/GCCP 算量合理性 | `workflows/quantity-indicator-check.md` |
+| 目标成本、动态成本、成本偏差、管理层摘要 | `workflows/cost-management.md` |
 | 综合单价组价、预算编制、投标报价分析、清标分析 | 无独立 workflow；按 `references/boq-and-pricing.md`、`references/fee-composition.md`、`templates/comprehensive-unit-price-analysis.md` 执行，并走二次审核 |
-| 成本测算、目标成本、动态成本 | 无独立 workflow；按 `references/cost-management.md` + `templates/management-summary.md` 执行，并走二次审核 |
 | 所有复杂任务交付前质检 | `workflows/second-pass-review.md` |
 
 ## Reference 导航
@@ -144,6 +144,8 @@ metadata:
 | 材料价差计算表 | `templates/material-price-adjustment-table.md` |
 | 综合单价分析表 | `templates/comprehensive-unit-price-analysis.md` |
 | 进度款审核表 | `templates/progress-payment-audit-table.md` |
+| 成本偏差分析表 | `templates/cost-variance-analysis-table.md` |
+| 目标成本测算表 | `templates/target-cost-estimate.md` |
 | 算量指标反查表 | `templates/quantity-indicator-check-table.md` |
 | 需补资料清单 | `templates/need-more-documents-list.md` |
 | 管理层摘要 | `templates/management-summary.md` |

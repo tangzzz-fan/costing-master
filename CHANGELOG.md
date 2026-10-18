@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.0 — 2026-10-18
+
+- 新增 `workflows/cost-management.md`：目标成本、动态成本、成本偏差和管理层摘要工作流
+- 新增 `templates/cost-variance-analysis-table.md`、`templates/target-cost-estimate.md`
+- 新增 `test-cases/cost-management.case.md`、`examples/cost-management-example.md`
+- `references/cost-management.md` 增加确定/预计/风险分列、结算成本边界和模板导航
+- `templates/management-summary.md` 增加数据日期和成本口径字段
+- SKILL/README/测试用例矩阵同步
+
 ## v0.4.2 — 2026-10-18
 
 - 新增 `references/standards-index.md` 草案：标准、法规、9 本计算标准、地方资料索引和更新检查清单（标准条目待人工审核）
