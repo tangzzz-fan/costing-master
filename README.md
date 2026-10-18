@@ -74,6 +74,7 @@ costing-master/
 │   ├── quota-application-and-conversion.md
 │   ├── rebar-flat-method-basics.md
 │   ├── standard-transition-check.md
+│   ├── 13-step-cost-management.md
 │   ├── contract-and-risk.md
 │   ├── change-order-and-claims.md
 │   ├── audit-and-settlement.md
@@ -81,7 +82,9 @@ costing-master/
 │   ├── cost-management.md
 │   ├── fee-composition.md
 │   ├── software-and-quotas.md
+│   ├── dwg-cad-handling.md
 │   ├── zaojia-indicators.md
+│   ├── market-pricing-fallback.md
 │   └── glossary.md
 ├── input-specs/
 ├── workflows/
@@ -150,13 +153,16 @@ git clone https://github.com/jayden-lg/costing-master.git ~/.claude/skills/costi
 
 ## 版本路线
 
-| 版本 | 目标 |
-|---|---|
-| v0.1 | 造价知识库、GB/T 50500-2024 口径、基础 reference |
-| v0.2 | 文件输入规范、Agent 工作流、输出模板、示例和测试用例 |
-| v0.3 | 定额换算、进度款审核、算量指标反查、新旧标准混用检查 |
-| v0.4 | 成本管理增强：目标成本、动态成本、偏差分析 |
-| v1.0 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
+当前版本：v0.4.0（详见 `CHANGELOG.md`）。
+
+| 版本 | 状态 | 目标 |
+|---|---|---|
+| v0.1 | 已发布 | 造价知识库、GB/T 50500-2024 口径、基础 reference |
+| v0.2 | 已发布 | 文件输入规范、Agent 工作流、输出模板、示例和测试用例 |
+| v0.3 | 已发布 | 定额换算、进度款审核、算量指标反查、新旧标准混用检查 |
+| v0.4 | 已发布 | DWG/CAD 处理、市场询价降级、二次审核量化、大型 BOQ 处理策略 |
+| v0.5 | 规划 | 成本管理增强：目标成本、动态成本、偏差分析 |
+| v1.0 | 规划 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
 
 ## 免责声明
 
