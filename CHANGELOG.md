@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9.0 — 2026-10-18
+
+- 新增 `references/evaluation-and-regression.md`：评估层级、golden case、质量指标、回归流程和限制
+- 新增 `templates/quality-report.md`：质量评估与回归报告模板
+- 新增 `scripts/eval_workflows.py`：workflow 覆盖率、测试用例登记率、数据来源声明率、真实/模拟用例数和 CI 结果报告
+- 新增 `test-cases/evaluation-and-regression.case.md`
+- CI 增加评估步骤，形成结构校验、业务断言、评估报告三步
+- README/SKILL/测试矩阵同步
+
 ## v0.8.0 — 2026-10-18
 
 - 新增 `references/file-extraction-and-evidence.md`：文件类型、抽取流程、证据索引、可靠性分级、资料完整性和安全边界

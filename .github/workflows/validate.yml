@@ -20,3 +20,5 @@ jobs:
         run: python3 scripts/validate.py
       - name: Run Suzhou metro scenario business assertions
         run: python3 scripts/test_scenarios.py
+      - name: Evaluate coverage and regression status
+        run: python3 scripts/eval_workflows.py

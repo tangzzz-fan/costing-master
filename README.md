@@ -77,6 +77,7 @@ costing-master/
 │   ├── region-jiangsu-shanghai-zhejiang.md
 │   ├── metro-rail-transit.md
 │   ├── file-extraction-and-evidence.md
+│   ├── evaluation-and-regression.md
 │   ├── gbt50500-2024.md
 │   ├── boq-and-pricing.md
 │   ├── boq-check-rules.md
@@ -161,11 +162,14 @@ git clone https://github.com/jayden-lg/costing-master.git ~/.claude/skills/costi
 ```bash
 python3 scripts/validate.py
 python3 scripts/test_scenarios.py
+python3 scripts/eval_workflows.py
 ```
 
-`validate.py` 检查 SKILL.md frontmatter、相对路径和链接、README 目录树、workflow 测试用例覆盖、markdown 表格一致性、重复标题和 emoji 禁用规则。
+`validate.py` 检查 SKILL.md frontmatter、相对路径和链接、README 目录树、workflow 测试用例覆盖、markdown 表格一致性、重复标题、测试用例数据来源和 emoji 禁用规则。
 
-`test_scenarios.py` 执行苏州地铁 VIII-TS-08 场景的确定性业务断言，包括进度款扣回、材料调差、结算组成差异和问题分类。GitHub Actions 在 push 和 pull request 时自动运行两步。
+`test_scenarios.py` 执行苏州地铁 VIII-TS-08 场景的确定性业务断言，包括进度款扣回、材料调差、结算组成差异和问题分类。
+
+`eval_workflows.py` 输出质量报告，统计 workflow 覆盖率、测试用例登记率、数据来源声明率、真实/模拟用例数和 CI 三步结果。GitHub Actions 在 push 和 pull request 时自动运行三步。
 
 仓库约定：正文和模板不使用 emoji 图标；状态标记使用 `[警告]`、`[通过]` 等文字。
 
@@ -181,7 +185,7 @@ python3 scripts/test_scenarios.py
 
 ## 版本路线
 
-当前版本：v0.8.0（详见 `CHANGELOG.md`）。v0.8.0 至 v1.0.0 的详细计划见 `ROADMAP.md`。
+当前版本：v0.9.0（详见 `CHANGELOG.md`）。v0.9.0 至 v1.0.0 的详细计划见 `ROADMAP.md`。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -196,6 +200,7 @@ python3 scripts/test_scenarios.py
 | v0.7 | 已发布 | 江浙沪地区资料包；地铁车站/盾构专项审核；版本门控 |
 | v0.7.1 | 已发布 | 苏州地铁 CI 业务测试：进度款、材料调差、结算差异自动断言 |
 | v0.8 | 已发布 | 文件抽取与证据链：证据索引、资料完整性、OCR/版本边界 |
+| v0.9 | 已发布 | 评估与回归体系：覆盖率、数据来源、质量报告和 CI 三步 |
 | v1.0 | 规划 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
 
 ## 免责声明

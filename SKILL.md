@@ -10,7 +10,7 @@ description: |
   组价、算量指标、新旧标准混用、目标成本。
   不用于海外计价规则、国际合同范本、非造价维度法律解释，且不替代签章、评标或法律意见。
 metadata:
-  version: "0.8.0"
+  version: "0.9.0"
 ---
 
 # 造价大师 Costing Master
@@ -118,6 +118,7 @@ metadata:
 | 江苏/上海/浙江地区资料与执行时间 | `references/region-jiangsu-shanghai-zhejiang.md` |
 | 地铁/轨道交通车站、盾构和变更索赔审核 | `references/metro-rail-transit.md` |
 | 文件抽取、证据索引和资料可靠性 | `references/file-extraction-and-evidence.md` |
+| 评估、回归和质量指标 | `references/evaluation-and-regression.md` |
 | GB/T 50500-2024 新旧对比、条款摘要 | `references/gbt50500-2024.md` |
 | 清单编制、综合单价、不平衡报价 | `references/boq-and-pricing.md` |
 | 清单特征、漏项、异常检查规则 | `references/boq-check-rules.md` |
@@ -157,6 +158,7 @@ metadata:
 | 地铁清单特征检查表 | `templates/metro-boq-feature-check-table.md` |
 | 地铁变更索赔证据清单 | `templates/metro-claim-evidence-checklist.md` |
 | 证据索引与资料完整性清单 | `templates/evidence-index.md` |
+| 质量评估与回归报告 | `templates/quality-report.md` |
 | 算量指标反查表 | `templates/quantity-indicator-check-table.md` |
 | 需补资料清单 | `templates/need-more-documents-list.md` |
 | 管理层摘要 | `templates/management-summary.md` |
