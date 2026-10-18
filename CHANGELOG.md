@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.8.0 — 2026-10-18
+
+- 新增 `references/file-extraction-and-evidence.md`：文件类型、抽取流程、证据索引、可靠性分级、资料完整性和安全边界
+- 新增 `input-specs/document-intake.md`：混合文件、扫描件、邮件、会议纪要的输入规范
+- 新增 `templates/evidence-index.md`：证据索引与资料完整性清单
+- 新增 `workflows/document-extraction-and-evidence.md`：文件抽取与证据链工作流
+- 新增 `test-cases/document-extraction-and-evidence.case.md` 和真实公开资料测试清单
+- 测试用例索引增加“数据来源”列和真实数据规则；每个新功能版本必须有对应测试用例
+- SKILL/README/测试矩阵同步
+
 ## v0.7.1 — 2026-10-18
 
 - 新增 `scripts/test_scenarios.py`：苏州地铁场景确定性业务断言，覆盖进度款扣回、材料调差、结算组成差异和问题分类

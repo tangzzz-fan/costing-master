@@ -178,6 +178,9 @@ def check_test_coverage() -> None:
     workflows = {p.name for p in (ROOT / "workflows").glob("*.md")}
     cases = {p.name for p in (ROOT / "test-cases").glob("*.case.md")}
 
+    if "| 数据来源 |" not in matrix:
+        ERRORS.append("test-cases/README.md: missing 数据来源 column")
+
     listed_workflows: set[str] = set()
     listed_cases: set[str] = set()
     for line in matrix.splitlines():
@@ -206,6 +209,8 @@ def check_test_coverage() -> None:
 
     for path in sorted((ROOT / "test-cases").glob("*.case.md")):
         text = read(path)
+        if "## 数据来源" not in text:
+            ERRORS.append(f"{rel(path)}: missing '## 数据来源'")
         if "## 期望行为" not in text:
             ERRORS.append(f"{rel(path)}: missing '## 期望行为'")
         if "## 失败表现" not in text:

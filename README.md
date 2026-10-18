@@ -31,6 +31,7 @@
 | 算量指标反查 | 钢筋、混凝土、模板、砌体等含量异常提示 |
 | 成本管理 | 目标成本初测、动态成本偏差表、管理层摘要 |
 | 轨道交通/地铁车站与盾构 | 清单特征检查表、变更索赔证据清单、进度款/结算审核 |
+| 资料抽取与证据链 | 证据索引、资料完整性清单、需补资料、OCR/版本风险提示 |
 
 ## 不能做什么
 
@@ -75,6 +76,7 @@ costing-master/
 │   ├── standards-index.md
 │   ├── region-jiangsu-shanghai-zhejiang.md
 │   ├── metro-rail-transit.md
+│   ├── file-extraction-and-evidence.md
 │   ├── gbt50500-2024.md
 │   ├── boq-and-pricing.md
 │   ├── boq-check-rules.md
@@ -179,7 +181,7 @@ python3 scripts/test_scenarios.py
 
 ## 版本路线
 
-当前版本：v0.7.1（详见 `CHANGELOG.md`）。v0.7.1 至 v1.0.0 的详细计划见 `ROADMAP.md`。
+当前版本：v0.8.0（详见 `CHANGELOG.md`）。v0.8.0 至 v1.0.0 的详细计划见 `ROADMAP.md`。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -193,6 +195,7 @@ python3 scripts/test_scenarios.py
 | v0.6 | 已发布 | 计价、投标报价与清标分析工作流 |
 | v0.7 | 已发布 | 江浙沪地区资料包；地铁车站/盾构专项审核；版本门控 |
 | v0.7.1 | 已发布 | 苏州地铁 CI 业务测试：进度款、材料调差、结算差异自动断言 |
+| v0.8 | 已发布 | 文件抽取与证据链：证据索引、资料完整性、OCR/版本边界 |
 | v1.0 | 规划 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
 
 ## 免责声明
