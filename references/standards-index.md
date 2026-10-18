@@ -1,6 +1,6 @@
 # 标准、法规与计价依据索引
 
-> 状态：草案 v0.3，待人工审核。
+> 状态：草案 v0.4，待人工审核。
 >
 > 用途：统一登记本 Skill 使用的国家标准、法规、合同示范文本和地方资料入口，减少重复查找，并为版本更新提供检查清单。
 >
@@ -109,6 +109,20 @@
 | `workflows/settlement-audit.md` | S01、S04、S05 | 结算审核工作流 |
 | `workflows/boq-missing-items-check.md` | S01、C01-C09 | 清单特征与漏项检查 |
 
+### 标准影响矩阵
+
+| 标准/地区 | 受影响 references/workflows/templates | 受影响测试 | 更新动作 |
+|---|---|---|---|
+| S01 GB/T 50500-2024 | `gbt50500-2024`、`boq-and-pricing`、`fee-composition`、`audit-and-settlement`、`contract-and-risk`、`material-price-adjustment`、`standard-transition-check`、`metro-rail-transit`；结算/清单/进度款/计价/地铁 workflow；综合单价、结算、清单模板 | `standard-transition`、`settlement-audit`、`pricing-and-bid-review`、`suzhou-metro-station` | 更新口径、预期值和标准索引 |
+| S02 GB 50500-2013 | `gbt50500-2024`、`fee-composition`、`audit-and-settlement`、`standard-transition-check` | `standard-transition`、旧项目场景 | 保留旧项目过渡，更新废止状态 |
+| C01-C09 工程量计算标准 | `boq-and-pricing`、`excel-boq`、`metro-boq`、清单/地铁 workflow | `boq-feature-missing`、`suzhou-metro-station` | 更新计算规则、清单特征 |
+| L01 江苏/苏州 | `standards-index`、`region-jiangsu-shanghai-zhejiang`、`software-and-quotas`、`fee-composition`、`boq-and-pricing`、`market-pricing-fallback`、`zaojia-indicators`、`metro-rail-transit` | `suzhou-metro-station`、`document-extraction-and-evidence` | 更新地方执行时间、费用和价格来源 |
+| L02 上海 / L03 浙江 | `region-jiangsu-shanghai-zhejiang`、`software-and-quotas`、`fee-composition`、`metro-rail-transit` | `document-extraction-and-evidence` | 更新地方执行时间和计价依据 |
+| S03 GF-2017-0201 | `contract-and-risk`、合同风险模板 | `contract-risk` | 更新合同风险条款 |
+| S04/S05 质量保证金/结算办法 | `audit-and-settlement`、结算/进度款 workflow | `settlement-audit`、`progress-payment` | 更新时限、质保金和结算口径 |
+
+> 标准或地方文件更新时，先按本矩阵列出受影响文件，再逐项更新并回归对应测试。
+
 ## 八、适用与过渡规则
 
 - 2025-09-01 起，国有资金占控股或主导地位的工程应执行 GB/T 50500-2024；非国有资金项目可参照执行。
@@ -150,10 +164,33 @@
 - [ ] 地方执行时间、实施细则和项目合同优先级。
 - [ ] 官方来源链接是否可访问、是否为官方或权威发布渠道。
 
-## 十一、变更记录
+## 十一、机器可读登记
+
+> 以下 JSON 与上表同步，供 `scripts/eval_workflows.py` 检查标准新鲜度和测试场景引用。更新标准时，表格和 JSON 两处都要改。
+
+```json
+{
+  "standards": [
+    {"id": "S01", "code": "GB/T 50500-2024", "status": "current", "effective_date": "2025-09-01", "superseded_date": null, "last_reviewed": "2026-10-18"},
+    {"id": "S02", "code": "GB 50500-2013", "status": "superseded", "effective_date": "2013-07-01", "superseded_date": "2025-09-01", "last_reviewed": "2026-10-18"},
+    {"id": "S03", "code": "GF-2017-0201", "status": "current", "effective_date": "2017-10-01", "superseded_date": null, "last_reviewed": "2026-10-18"},
+    {"id": "S04", "code": "建质〔2017〕138号", "status": "current", "effective_date": "2017-06-20", "superseded_date": null, "last_reviewed": "2026-10-18"},
+    {"id": "S05", "code": "财建〔2004〕369号", "status": "current", "effective_date": "2004-10-20", "superseded_date": null, "last_reviewed": "2026-10-18"},
+    {"id": "S06", "code": "建市〔2017〕214号", "status": "current", "effective_date": "2017-09-22", "superseded_date": null, "last_reviewed": "2026-10-18"}
+  ],
+  "local_rules": [
+    {"id": "L01", "region": "江苏/苏州", "name": "2026版江苏省建设工程消耗量指标/费用参考；苏州建函建〔2026〕72号", "status": "current", "effective_date": "2026-06-01", "last_reviewed": "2026-10-18"},
+    {"id": "L02", "region": "上海", "name": "上海市建设工程工程量清单计价应用规则（2025版）", "status": "current", "effective_date": "2026-01-01", "last_reviewed": "2026-10-18"},
+    {"id": "L03", "region": "浙江", "name": "浙江省建设工程计价依据（2025版）", "status": "upcoming", "effective_date": "2026-11-01", "last_reviewed": "2026-10-18"}
+  ]
+}
+```
+
+## 十二、变更记录
 
 | 日期 | 版本 | 变更 | 审核 |
 |---|---|---|---|
 | 2026-10-18 | v0.1 | 初稿：登记核心标准、9 本计算标准、地方资料和更新流程 | 待人工审核 |
 | 2026-10-18 | v0.2 | 增加江苏/苏州、上海、浙江地区优先级、执行时间、官方来源和地区使用要点 | 待人工审核 |
 | 2026-10-18 | v0.3 | 增加城市轨道交通专项计价依据索引 | 待人工审核 |
+| 2026-10-18 | v0.4 | 增加标准影响矩阵和机器可读登记，供标准新鲜度检查使用 | 待人工审核 |

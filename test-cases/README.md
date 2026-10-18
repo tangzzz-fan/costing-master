@@ -30,6 +30,7 @@
 | 苏州地铁车站土建结算 | `test-cases/suzhou-metro-station.case.md` | 真实公开项目框架 + 模拟成本数据 | 地铁车站/盾构、变更签证、材料调差、进度款、结算审核、地区资料 |
 | 混合文件抽取与证据链 | `test-cases/document-extraction-and-evidence.case.md` | 真实公开资料 + 缺失清单 | 文件识别、字段抽取、证据索引、资料完整性、OCR/版本边界 |
 | 评估与回归 | `test-cases/evaluation-and-regression.case.md` | 真实公开 + 现有用例 | 覆盖率、数据来源、CI 三步、质量报告、人工语义审核 |
+| 标准变动与地方执行 | `test-cases/standard-change.case.md` | 真实公开标准/地方通知 | 标准版本识别、地方执行时间、合同日期划断、影响矩阵、测试更新 |
 
 ## 回归约定
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.9.1 — 2026-10-18
+
+- `references/standards-index.md` 增加标准影响矩阵和机器可读登记（v0.4）
+- `test-cases/fixtures/suzhou-metro-viii-ts-08/scenario.json` 增加 `standard_version`、`local_rules_id`、`last_reviewed` 和 `legacy_project`
+- `scripts/eval_workflows.py` 增加标准新鲜度检查：标准/地方规则登记、废止标志、12 个月核对期限
+- 新增 `test-cases/standard-change.case.md`：使用真实公开的江苏/苏州标准执行通知，测试标准变动、合同日期划断和影响矩阵
+- `templates/quality-report.md` 增加标准新鲜度字段
+- 新增 `CAPABILITIES.md`：预算/计价场景和其他常用功能清单
+- README/SKILL/测试矩阵同步
+
 ## v0.9.0 — 2026-10-18
 
 - 新增 `references/evaluation-and-regression.md`：评估层级、golden case、质量指标、回归流程和限制

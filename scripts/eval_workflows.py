@@ -7,10 +7,11 @@ The report is written to stdout by default. Use --output to save a Markdown file
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import subprocess
 import sys
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -61,6 +62,109 @@ def version() -> str:
     return match.group(1) if match else "unknown"
 
 
+def load_registry() -> dict | None:
+    text = read(ROOT / "references" / "standards-index.md")
+    match = re.search(r"```json\n(.*?)\n```", text, re.DOTALL)
+    if not match:
+        return None
+    try:
+        return json.loads(match.group(1))
+    except json.JSONDecodeError:
+        return None
+
+
+def parse_date(value: object) -> date | None:
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return None
+
+
+def standard_freshness(registry: dict | None) -> tuple[dict[str, str], list[str]]:
+    gaps: list[str] = []
+    info = {
+        "standard": "未登记",
+        "local_rules": "未登记",
+        "scenario_last_reviewed": "未登记",
+        "standard_last_reviewed": "未登记",
+        "local_last_reviewed": "未登记",
+        "stale": "unknown",
+        "legacy_project": "unknown",
+    }
+    scenario_path = (
+        ROOT / "test-cases" / "fixtures" / "suzhou-metro-viii-ts-08" / "scenario.json"
+    )
+    if registry is None:
+        return info, ["standards-index.md machine-readable registry missing or invalid"]
+    if not scenario_path.exists():
+        return info, ["Suzhou metro scenario.json missing"]
+
+    scenario = json.loads(read(scenario_path))
+    code = scenario.get("standard_version")
+    local_id = scenario.get("local_rules_id")
+    legacy = bool(scenario.get("legacy_project"))
+    reviewed = parse_date(scenario.get("last_reviewed"))
+    today = date.today()
+    cutoff = today - timedelta(days=365)
+    info["legacy_project"] = "yes" if legacy else "no"
+    info["scenario_last_reviewed"] = str(scenario.get("last_reviewed", "missing"))
+
+    if reviewed is None:
+        gaps.append("scenario last_reviewed missing or invalid")
+    elif reviewed < cutoff:
+        gaps.append(f"scenario last_reviewed is older than 12 months: {reviewed}")
+
+    standards = {item.get("code"): item for item in registry.get("standards", [])}
+    standard = standards.get(code)
+    if not standard:
+        gaps.append(f"standard not registered: {code}")
+    else:
+        status = standard.get("status")
+        info["standard"] = f"{code} ({status})"
+        info["standard_last_reviewed"] = str(
+            standard.get("last_reviewed", "missing")
+        )
+        if status == "superseded" and not legacy:
+            gaps.append(
+                f"scenario uses superseded standard without legacy flag: {code}"
+            )
+        if status == "current":
+            effective = parse_date(standard.get("effective_date"))
+            if effective and effective > today:
+                gaps.append(f"standard marked current but effective in future: {code}")
+        standard_reviewed = parse_date(standard.get("last_reviewed"))
+        if standard_reviewed is None:
+            gaps.append(f"standard last_reviewed missing: {code}")
+        elif standard_reviewed < cutoff:
+            gaps.append(f"standard last_reviewed older than 12 months: {code}")
+
+    local_rules = {item.get("id"): item for item in registry.get("local_rules", [])}
+    local = local_rules.get(local_id)
+    if not local:
+        gaps.append(f"local rule not registered: {local_id}")
+    else:
+        status = local.get("status")
+        info["local_rules"] = (
+            f"{local_id} {local.get('region')} ({status})"
+        )
+        info["local_last_reviewed"] = str(local.get("last_reviewed", "missing"))
+        if status in {"superseded", "upcoming"} and not legacy:
+            gaps.append(
+                "scenario uses non-current local rule without legacy flag: "
+                f"{local_id} ({status})"
+            )
+        local_reviewed = parse_date(local.get("last_reviewed"))
+        if local_reviewed is None:
+            gaps.append(f"local rule last_reviewed missing: {local_id}")
+        elif local_reviewed < cutoff:
+            gaps.append(f"local rule last_reviewed older than 12 months: {local_id}")
+
+    info["stale"] = "yes" if gaps else "no"
+    return info, gaps
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", help="optional Markdown report path")
@@ -106,6 +210,8 @@ def main() -> int:
     )
 
     gaps: list[str] = []
+    freshness, freshness_gaps = standard_freshness(load_registry())
+    gaps.extend(freshness_gaps)
     if workflow_coverage < 100:
         missing = sorted(workflow_names - listed_workflows)
         gaps.append("workflow coverage gap: " + ", ".join(missing))
@@ -161,6 +267,18 @@ def main() -> int:
         report_lines.append(f"| {source} | {count} |")
     report_lines.extend(
         [
+            "",
+            "## Standard Freshness",
+            "",
+            "| Item | Value |",
+            "|---|---|",
+            f"| Scenario standard | {freshness['standard']} |",
+            f"| Scenario local rules | {freshness['local_rules']} |",
+            f"| Scenario last reviewed | {freshness['scenario_last_reviewed']} |",
+            f"| Standard last reviewed | {freshness['standard_last_reviewed']} |",
+            f"| Local rule last reviewed | {freshness['local_last_reviewed']} |",
+            f"| Stale | {freshness['stale']} |",
+            f"| Legacy project | {freshness['legacy_project']} |",
             "",
             "## CI Checks",
             "",

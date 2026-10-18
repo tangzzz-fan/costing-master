@@ -5,6 +5,11 @@
     "contract_days": 1507,
     "source": "https://ggzy.suzhou.gov.cn/jyxx/003001/003001031/20260129/f8e70ee1-5c67-482a-997c-7e9c289e1e26.html"
   },
+  "standard_version": "GB/T 50500-2024",
+  "local_rules_id": "L01",
+  "local_rules_version": "2026版江苏省建设工程消耗量指标/费用参考；苏州建函建〔2026〕72号",
+  "last_reviewed": "2026-10-18",
+  "legacy_project": false,
   "progress_payment": {
     "reported_completed": 80000000,
     "unconfirmed_visa": 2000000,
