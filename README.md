@@ -165,6 +165,7 @@ git clone https://github.com/jayden-lg/costing-master.git ~/.claude/skills/costi
 ```bash
 python3 scripts/validate.py
 python3 scripts/test_scenarios.py
+python3 scripts/test_standard_change.py
 python3 scripts/eval_workflows.py
 ```
 
@@ -172,7 +173,9 @@ python3 scripts/eval_workflows.py
 
 `test_scenarios.py` 执行苏州地铁 VIII-TS-08 场景的确定性业务断言，包括进度款扣回、材料调差、结算组成差异和问题分类。
 
-`eval_workflows.py` 输出质量报告，统计 workflow 覆盖率、测试用例登记率、数据来源声明率、真实/模拟用例数、标准新鲜度和 CI 三步结果。GitHub Actions 在 push 和 pull request 时自动运行三步。
+`test_standard_change.py` 执行苏州/浙江标准变动断言，检查旧版/新版标准、地方规则、招标日期划断和适用性。
+
+`eval_workflows.py` 输出质量报告，统计 workflow 覆盖率、测试用例登记率、数据来源声明率、真实/模拟用例数、标准新鲜度和 CI 四步结果。GitHub Actions 在 push 和 pull request 时自动运行四步。
 
 仓库约定：正文和模板不使用 emoji 图标；状态标记使用 `[警告]`、`[通过]` 等文字。
 
@@ -188,7 +191,7 @@ python3 scripts/eval_workflows.py
 
 ## 版本路线
 
-当前版本：v0.9.1（详见 `CHANGELOG.md`）。v0.9.1 至 v1.0.0 的详细计划见 `ROADMAP.md`。
+当前版本：v0.9.2（详见 `CHANGELOG.md`）。v0.9.2 至 v1.0.0 的详细计划见 `ROADMAP.md`。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -205,6 +208,7 @@ python3 scripts/eval_workflows.py
 | v0.8 | 已发布 | 文件抽取与证据链：证据索引、资料完整性、OCR/版本边界 |
 | v0.9 | 已发布 | 评估与回归体系：覆盖率、数据来源、质量报告和 CI 三步 |
 | v0.9.1 | 已发布 | 标准变动回归：标准新鲜度、影响矩阵和标准变动测试 |
+| v0.9.2 | 已发布 | 苏州/浙江标准变动实际场景测试：旧版/新版适用性断言 |
 | v1.0 | 规划 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
 
 ## 免责声明

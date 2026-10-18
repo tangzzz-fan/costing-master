@@ -20,7 +20,7 @@
 | 数据来源声明率 | 100% |  |  |
 | 真实数据用例数 | 每个新功能至少 1 个 |  |  |
 | 确定性断言数 | 覆盖核心计算 |  |  |
-| CI 三步通过 | 3/3 |  |  |
+| CI 四步通过 | 4/4 |  |  |
 | 人工语义验收 | 核心用例 |  |  |
 
 ### 标准新鲜度
@@ -41,6 +41,7 @@
 |---|---|---|---|
 | 结构校验 | `python3 scripts/validate.py` | 通过/失败 |  |
 | 业务断言 | `python3 scripts/test_scenarios.py` | 通过/失败 |  |
+| 标准变动断言 | `python3 scripts/test_standard_change.py` | 通过/失败 |  |
 | 评估报告 | `python3 scripts/eval_workflows.py` | 通过/失败 |  |
 
 ## 四、覆盖与缺口

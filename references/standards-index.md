@@ -1,6 +1,6 @@
 # 标准、法规与计价依据索引
 
-> 状态：草案 v0.4，待人工审核。
+> 状态：草案 v0.5，待人工审核。
 >
 > 用途：统一登记本 Skill 使用的国家标准、法规、合同示范文本和地方资料入口，减少重复查找，并为版本更新提供检查清单。
 >
@@ -77,6 +77,8 @@
 | 浙江 | 《浙江省城市轨道交通工程定额（2025版）》 | 2026-11-01 施行；2018 版执行至 2026-10-31 | [浙江省建设厅](https://www.zjzj.net/news/newsInfor/10/detailed/37014df096b2ecf30198f4e03bd4016f) | 待人工审核 |
 
 > 城市轨道交通专业界面和定额差异大，详见 `references/metro-rail-transit.md`；正式项目以项目所在地现行文件、招标文件和合同为准。
+>
+> 历史版本：江苏 2014 版计价定额/费用定额于 2026-06-01 废止；浙江 2018 版计价依据于 2026-11-01 废止。机器可读登记中分别使用 L00、L04，供标准变动测试使用。
 
 ## 六、地方与项目级资料
 
@@ -179,9 +181,11 @@
     {"id": "S06", "code": "建市〔2017〕214号", "status": "current", "effective_date": "2017-09-22", "superseded_date": null, "last_reviewed": "2026-10-18"}
   ],
   "local_rules": [
-    {"id": "L01", "region": "江苏/苏州", "name": "2026版江苏省建设工程消耗量指标/费用参考；苏州建函建〔2026〕72号", "status": "current", "effective_date": "2026-06-01", "last_reviewed": "2026-10-18"},
-    {"id": "L02", "region": "上海", "name": "上海市建设工程工程量清单计价应用规则（2025版）", "status": "current", "effective_date": "2026-01-01", "last_reviewed": "2026-10-18"},
-    {"id": "L03", "region": "浙江", "name": "浙江省建设工程计价依据（2025版）", "status": "upcoming", "effective_date": "2026-11-01", "last_reviewed": "2026-10-18"}
+    {"id": "L00", "region": "江苏/苏州", "name": "江苏省2014版计价定额/费用定额（历史版本）", "status": "superseded", "effective_date": null, "superseded_date": "2026-06-01", "last_reviewed": "2026-10-18"},
+    {"id": "L01", "region": "江苏/苏州", "name": "2026版江苏省建设工程消耗量指标/费用参考；苏州建函建〔2026〕72号", "status": "current", "effective_date": "2026-06-01", "superseded_date": null, "last_reviewed": "2026-10-18"},
+    {"id": "L02", "region": "上海", "name": "上海市建设工程工程量清单计价应用规则（2025版）", "status": "current", "effective_date": "2026-01-01", "superseded_date": null, "last_reviewed": "2026-10-18"},
+    {"id": "L03", "region": "浙江", "name": "浙江省建设工程计价依据（2025版）", "status": "upcoming", "effective_date": "2026-11-01", "superseded_date": null, "last_reviewed": "2026-10-18"},
+    {"id": "L04", "region": "浙江", "name": "浙江省建设工程计价依据（2018版，历史版本）", "status": "superseded", "effective_date": null, "superseded_date": "2026-11-01", "last_reviewed": "2026-10-18"}
   ]
 }
 ```
@@ -194,3 +198,4 @@
 | 2026-10-18 | v0.2 | 增加江苏/苏州、上海、浙江地区优先级、执行时间、官方来源和地区使用要点 | 待人工审核 |
 | 2026-10-18 | v0.3 | 增加城市轨道交通专项计价依据索引 | 待人工审核 |
 | 2026-10-18 | v0.4 | 增加标准影响矩阵和机器可读登记，供标准新鲜度检查使用 | 待人工审核 |
+| 2026-10-18 | v0.5 | 增加历史版本 L00/L04，供苏州/浙江标准变动测试使用 | 待人工审核 |

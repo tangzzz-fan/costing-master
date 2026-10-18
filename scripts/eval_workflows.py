@@ -21,6 +21,10 @@ def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def one_line(value: str) -> str:
+    return " ".join(value.replace("|", "/").split())
+
+
 def markdown_files(folder: str) -> list[Path]:
     return sorted((ROOT / folder).glob("*.md"))
 
@@ -208,6 +212,9 @@ def main() -> int:
     scenario_ok, scenario_output = run_step(
         "scenarios", ["scripts/test_scenarios.py"]
     )
+    standard_change_ok, standard_change_output = run_step(
+        "standard-change", ["scripts/test_standard_change.py"]
+    )
 
     gaps: list[str] = []
     freshness, freshness_gaps = standard_freshness(load_registry())
@@ -229,6 +236,8 @@ def main() -> int:
         gaps.append("validate.py failed")
     if not scenario_ok:
         gaps.append("test_scenarios.py failed")
+    if not standard_change_ok:
+        gaps.append("test_standard_change.py failed")
 
     status = "PASS" if not gaps else "FAIL"
     report_lines = [
@@ -284,8 +293,9 @@ def main() -> int:
             "",
             "| Step | Result | Detail |",
             "|---|---|---|",
-            f"| validate.py | {'PASS' if validate_ok else 'FAIL'} | {validate_output.replace('|', '/')} |",
-            f"| test_scenarios.py | {'PASS' if scenario_ok else 'FAIL'} | {scenario_output.replace('|', '/')} |",
+            f"| validate.py | {'PASS' if validate_ok else 'FAIL'} | {one_line(validate_output)} |",
+            f"| test_scenarios.py | {'PASS' if scenario_ok else 'FAIL'} | {one_line(scenario_output)} |",
+            f"| test_standard_change.py | {'PASS' if standard_change_ok else 'FAIL'} | {one_line(standard_change_output)} |",
             "",
             "## Gaps",
             "",

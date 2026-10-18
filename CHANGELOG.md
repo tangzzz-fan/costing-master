@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.9.2 — 2026-10-18
+
+- 新增 `test-cases/fixtures/standard-change/scenario.json`：苏州/浙江标准变动适用性测试数据
+- 新增 `scripts/test_standard_change.py`：A/B/C/D 四项目旧版/新版标准与地方规则断言
+- 扩充 `test-cases/standard-change.case.md`：苏州 2026-06-01 实际变更 + 浙江 2026-11-01 即将变更
+- `standards-index.md` 增加历史版本 L00（江苏 2014 版）和 L04（浙江 2018 版）
+- CI 增加标准变动断言步骤，形成结构、业务、标准变动、评估四步
+- 质量报告模板增加标准变动检查
+- bump version 0.9.2
+
 ## v0.9.1 — 2026-10-18
 
 - `references/standards-index.md` 增加标准影响矩阵和机器可读登记（v0.4）

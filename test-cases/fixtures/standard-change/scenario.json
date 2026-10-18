@@ -1,0 +1,44 @@
+{
+  "projects": [
+    {
+      "id": "A",
+      "region": "江苏/苏州",
+      "tender_date": "2026-05-20",
+      "contract_date": "2026-05-28",
+      "expected_standard": "GB 50500-2013",
+      "expected_local": "L00"
+    },
+    {
+      "id": "B",
+      "region": "江苏/苏州",
+      "tender_date": "2026-06-15",
+      "contract_date": "2026-07-01",
+      "expected_standard": "GB/T 50500-2024",
+      "expected_local": "L01"
+    },
+    {
+      "id": "C",
+      "region": "浙江",
+      "tender_date": "2026-10-20",
+      "contract_date": "2026-10-28",
+      "expected_standard": "GB/T 50500-2024",
+      "expected_local": "L04"
+    },
+    {
+      "id": "D",
+      "region": "浙江",
+      "tender_date": "2026-11-05",
+      "contract_date": "2026-11-12",
+      "expected_standard": "GB/T 50500-2024",
+      "expected_local": "L03"
+    }
+  ],
+  "cutoffs": {
+    "江苏/苏州": "2026-06-01",
+    "浙江": "2026-11-01"
+  },
+  "sources": {
+    "江苏/苏州": "https://zfcjj.suzhou.gov.cn/szszjj/tzgg/202604/7560cd682a16499b8547ea3cc10e95aa.shtml",
+    "浙江": "https://www.zjzj.net/news/newsInfor/10/detailed/37014df096b2ecf30198f4e03bd4016f"
+  }
+}
