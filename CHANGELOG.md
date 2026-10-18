@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.10.0 — 2026-10-18
+
+- 新增 `references/enterprise-delivery.md`：角色分离、交付物清单、G1-G6 审核 gate、审计轨迹、版本兼容、保密与归档
+- 新增 `templates/review-record.md` 和 `templates/delivery-package.md`
+- 新增 `workflows/enterprise-delivery.md`：内部审核、对外交付包和归档工作流
+- 新增 `test-cases/enterprise-delivery.case.md` 和 `examples/enterprise-delivery-example.md`
+- 明确 AI 只做工作底稿，不签认、不盖章、不代替注册造价工程师
+- SKILL/README/CAPABILITIES/测试矩阵同步
+- bump version 0.10.0
+
 ## v0.9.2 — 2026-10-18
 
 - 新增 `test-cases/fixtures/standard-change/scenario.json`：苏州/浙江标准变动适用性测试数据

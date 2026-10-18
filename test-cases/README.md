@@ -13,6 +13,7 @@
 | `workflows/pricing-and-bid-review.md` | `test-cases/pricing-and-bid-review.case.md` | `examples/pricing-and-bid-review-example.md` | 模拟/教学 | 组价边界、不平衡报价、清标问题、不代替评标 |
 | `workflows/metro-rail-transit-audit.md` | `test-cases/suzhou-metro-station.case.md` | `examples/suzhou-metro-station-verification.md` | 真实公开项目框架 + 模拟成本数据 | 地铁车站/盾构、变更签证、材料调差、进度款、结算 |
 | `workflows/document-extraction-and-evidence.md` | `test-cases/document-extraction-and-evidence.case.md` | `examples/document-extraction-example.md` | 真实公开资料 + 缺失清单 | 文件识别、字段抽取、证据索引、资料完整性、OCR/版本边界 |
+| `workflows/enterprise-delivery.md` | `test-cases/enterprise-delivery.case.md` | `examples/enterprise-delivery-example.md` | 真实公开项目框架 + 现有测试证据（成本细节为模拟） | 角色分离、交付包、审核记录、签认边界、版本兼容 |
 | `workflows/boq-missing-items-check.md` | `test-cases/boq-feature-missing.case.md` | `examples/boq-check-example.md` | 模拟/教学 | 特征缺失、疑似漏项、量价交叉验证、不直接组价 |
 | `workflows/contract-risk-review.md` | `test-cases/contract-risk.case.md` | `examples/contract-risk-example.md` | 模拟/教学 | 风险分级、条款引用、不做法定性 |
 | `workflows/change-visa-audit.md` | `test-cases/duplicate-visa.case.md` | `examples/change-visa-example.md` | 模拟/教学 | 重复计取、证据链、书面指令、人工确认 |

@@ -34,6 +34,7 @@
 | 成本管理 | 目标成本初测、动态成本偏差表、管理层摘要 |
 | 轨道交通/地铁车站与盾构 | 清单特征检查表、变更索赔证据清单、进度款/结算审核 |
 | 资料抽取与证据链 | 证据索引、资料完整性清单、需补资料、OCR/版本风险提示 |
+| 企业级交付 | 交付包、审核记录、审计轨迹、签认边界、归档清单 |
 
 ## 不能做什么
 
@@ -81,6 +82,7 @@ costing-master/
 │   ├── metro-rail-transit.md
 │   ├── file-extraction-and-evidence.md
 │   ├── evaluation-and-regression.md
+│   ├── enterprise-delivery.md
 │   ├── gbt50500-2024.md
 │   ├── boq-and-pricing.md
 │   ├── boq-check-rules.md
@@ -191,7 +193,7 @@ python3 scripts/eval_workflows.py
 
 ## 版本路线
 
-当前版本：v0.9.2（详见 `CHANGELOG.md`）。v0.9.2 至 v1.0.0 的详细计划见 `ROADMAP.md`。
+当前版本：v0.10.0（详见 `CHANGELOG.md`）。v0.10.0 至 v1.0.0 的详细计划见 `ROADMAP.md`。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -209,6 +211,7 @@ python3 scripts/eval_workflows.py
 | v0.9 | 已发布 | 评估与回归体系：覆盖率、数据来源、质量报告和 CI 三步 |
 | v0.9.1 | 已发布 | 标准变动回归：标准新鲜度、影响矩阵和标准变动测试 |
 | v0.9.2 | 已发布 | 苏州/浙江标准变动实际场景测试：旧版/新版适用性断言 |
+| v0.10 | 已发布 | 企业级交付：角色分离、交付包、审核记录、审计轨迹和归档 |
 | v1.0 | 规划 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
 
 ## 免责声明
