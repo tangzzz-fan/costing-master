@@ -144,6 +144,16 @@ mkdir -p ~/.claude/skills
 git clone https://github.com/jayden-lg/costing-master.git ~/.claude/skills/costing-master
 ```
 
+## 开发校验
+
+```bash
+python3 scripts/validate.py
+```
+
+校验内容包括：SKILL.md frontmatter、相对路径和链接、README 目录树、workflow 测试用例覆盖、markdown 表格一致性、重复标题和 emoji 禁用规则。GitHub Actions 在 push 和 pull request 时自动运行。
+
+仓库约定：正文和模板不使用 emoji 图标；状态标记使用 `[警告]`、`[通过]` 等文字。
+
 ## 适用依据
 
 - GB/T 50500-2024《建设工程工程量清单计价标准》
@@ -153,7 +163,7 @@ git clone https://github.com/jayden-lg/costing-master.git ~/.claude/skills/costi
 
 ## 版本路线
 
-当前版本：v0.4.0（详见 `CHANGELOG.md`）。
+当前版本：v0.4.1（详见 `CHANGELOG.md`）。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -161,6 +171,7 @@ git clone https://github.com/jayden-lg/costing-master.git ~/.claude/skills/costi
 | v0.2 | 已发布 | 文件输入规范、Agent 工作流、输出模板、示例和测试用例 |
 | v0.3 | 已发布 | 定额换算、进度款审核、算量指标反查、新旧标准混用检查 |
 | v0.4 | 已发布 | DWG/CAD 处理、市场询价降级、二次审核量化、大型 BOQ 处理策略 |
+| v0.4.1 | 已发布 | 2024 版费用口径修正、测试覆盖、示例、CI 和 emoji 禁用校验 |
 | v0.5 | 规划 | 成本管理增强：目标成本、动态成本、偏差分析 |
 | v1.0 | 规划 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
 

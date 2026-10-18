@@ -42,12 +42,14 @@
 
 检测到 AutoCAD 后，优先使用以下两种方案，跳过 QCAD 安装。
 
-### 3A.2 轻量算量方案（AutoLISP，免费）
+### 3A.2 轻量算量方案（AutoLISP，可选）
 
-1. 下载 [ferhatatesmech/AutoCAD-Quantity-Takeoff](https://github.com/ferhatatesmech/AutoCAD-Quantity-Takeoff)（GitHub 开源）
-2. AutoCAD 内 `APPLOAD` → 加载 `quantity.lsp`
-3. 按图层选择对象 → 自动汇总长度/面积 → 导出 CSV
-4. 将 CSV 与清单量做差值对比
+> 安全提示：以下第三方脚本仅作为可选方案。执行前必须由用户确认来源、许可证和代码内容；Agent 不应自动下载或加载第三方脚本。
+
+1. 由用户自行下载并审核 [ferhatatesmech/AutoCAD-Quantity-Takeoff](https://github.com/ferhatatesmech/AutoCAD-Quantity-Takeoff) 的 `quantity.lsp`，或使用用户已有的可信脚本。
+2. 由用户在 AutoCAD 中手动 `APPLOAD` 加载脚本；Agent 只提供步骤和结果分析。
+3. 用户按图层选择对象 → 汇总长度/面积 → 导出 CSV。
+4. 将 CSV 与清单量做差值对比。
 
 适用场景：按图层分构件（如 S-COLUMN、S-BEAM）的 DWG，可快速提取各图层多段线面积和线段长度。
 
@@ -78,6 +80,8 @@ QCAD 试用版启动时有约 15 秒延迟，频繁调用时不可行，仅适�
 
 ### 安装 QCAD（macOS）
 
+> 安装前应由用户确认；Agent 不应在未确认的情况下执行安装命令。
+
 ```bash
 brew install --cask qcad
 ```
@@ -85,8 +89,9 @@ brew install --cask qcad
 ### 执行实体提取
 
 ```bash
-# 注意：dwg2csv 实际路径在 QCAD.app/Contents/Resources/ 下，非 scripts/Proc/Dwg2Csv/
-qcad -no-gui -autostop Resources/scripts/Proc/Dwg2Csv/dwg2csv.js <file.dwg> -o <output_dir>
+# 注意：dwg2csv.js 位于 QCAD 应用包的 Resources/scripts/Proc/Dwg2Csv/ 下
+# 请按实际安装路径替换 <QCAD.app>
+qcad -no-gui -autostop "<QCAD.app>/Contents/Resources/scripts/Proc/Dwg2Csv/dwg2csv.js" <file.dwg> -o <output_dir>
 ```
 
 ### 提取后分析

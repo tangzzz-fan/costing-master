@@ -1,11 +1,30 @@
 # Changelog
 
-## Unreleased
+## v0.4.1 — 2026-10-18
+
+### 修正
 
 - 修正 GB/T 50500-2024 章节结构、综合单价口径、材料调差公式、结算审核时限来源、12位项目编码标签、费用组成人员归属和无限风险对比表
+- 按 2024 版拆分安全生产措施费、文明施工费、环境保护费和临时设施费；修正安全生产措施费“不可竞争”的绝对表述
+- 增值税计税基数排除含税的专业工程暂估价，避免重复计税
+- 修正管理费取费基数和比例表述、缺陷责任期退还质保金表述、斯维尔厂商名称和竣工结算英文术语
+- 标注审减率、地区系数、暂列金额比例和 2025 年指标为经验参考或待更新数据；成都示例改为项目所在地占位口径
 - 同步 README 目录结构与版本路线
 
-## v0.4.0
+### 新增
+
+- 新增 `test-cases/settlement-audit.case.md`、`test-cases/README.md` 覆盖矩阵
+- 新增 `examples/progress-payment-example.md`、`examples/change-visa-example.md`
+- 新增 `scripts/validate.py` 和 `.github/workflows/validate.yml`
+- 新增仓库禁用 emoji 约定，并加入校验脚本
+
+### 调整
+
+- 合并 SKILL.md 重复的自检章节，质检模板补充质检时间、检查人、可交付签章字段
+- DWG 第三方 AutoLISP 脚本改为用户确认后手动执行的可选步骤
+- README 增加开发校验说明；SKILL.md 增加 `metadata.version`
+
+## v0.4.0 — 2026-05-27
 
 - 新增 `references/dwg-cad-handling.md`：DWG/CAD 三级处理能力模型（L1文本/L2几何/L3模型算量），能力判断流程，QCAD轻量提取操作指南，诚实表述模板
 - 新增 `references/market-pricing-fallback.md`：信息价缺失时的五级定价降级方法，地区系数参考，主要材料暂估方法，定价输出格式规范
@@ -13,7 +32,7 @@
 - `workflows/quantity-indicator-check.md`：新增步骤0 — 按清单文件规模选择处理策略（≤3/4-15/>15张计价表），按专业分组+重复编码跨sheet核查
 - `input-specs/excel-boq.md`：新增广联达/GCCP标准导出格式快速识别（6类工作表+标准列结构），大型BOQ三级处理策略
 
-## v0.3.0
+## v0.3.0 — 2026-05-26
 
 - 新增 `references/quota-application-and-conversion.md`：定额套用与换算实操，清单量与定额量区分，端到端组价示例
 - 新增 `references/rebar-flat-method-basics.md`：钢筋平法基础知识，含钢量异常信号及复核提示
@@ -23,7 +42,7 @@
 - 新增 `templates/progress-payment-audit-table.md`、`templates/quantity-indicator-check-table.md`
 - 新增安装/市政清单专项检查规则
 
-## v0.2.0
+## v0.2.0 — 2026-05-26
 
 - 将 Skill 定位从知识参考扩展为文件审核工作流辅助
 - 新增 `input-specs/`：定义清单、合同、结算书、签证变更、材料价格表的输入规范
@@ -34,7 +53,7 @@
 - 强化证据引用、缺资料处理、价格/定额防胡编和人工确认规则
 - 新增二次审核工作流和质检报告模板
 
-## v0.1.0
+## v0.1.0 — 2026-05-26
 
 - 初始造价知识库版本
 - 覆盖 GB/T 50500-2024、清单计价、综合单价、合同风险、变更签证、材料调差、结算审核等基础 reference

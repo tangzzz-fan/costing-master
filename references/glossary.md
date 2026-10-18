@@ -103,7 +103,7 @@
 | 停窝工 | Suspension and Idle Time |
 | 反索赔 | Counterclaim |
 | 争议评审 | Dispute Review / Dispute Adjudication |
-| 竣工结算 | Final Account (Completion Settlement) |
+| 竣工结算 | Completion Settlement |
 
 ## 六、结算与审计（Settlement & Audit）
 

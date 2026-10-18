@@ -18,7 +18,8 @@
 3. 按 `references/boq-check-rules.md` 检查特征描述完整性。
 4. 对照招标范围、图纸说明和常见分部分项，列出疑似漏项。
 5. 检查单位、精度、重复编码、措施/其他项目口径。
-6. 输出清单特征检查表、漏项登记表和需确认问题。
+6. 按 `references/boq-check-rules.md` 第七节执行量价交叉验证，标记单价离散、含量异常和大金额集中度问题。
+7. 输出清单特征检查表、漏项登记表、量价交叉验证摘要和需确认问题。
 
 ## 中间判断
 
@@ -29,7 +30,7 @@
 
 ## 输出成果
 
-- `templates/boq-feature-check-table.md`
+- `templates/boq-feature-check-table.md`（含量价交叉验证摘要）
 - `templates/boq-missing-items-register.md`
 - `templates/need-more-documents-list.md`
 
