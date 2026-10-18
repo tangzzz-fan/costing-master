@@ -1,5 +1,7 @@
 # Excel 清单/报价表输入规范
 
+> 地铁/轨道交通清单另见 `input-specs/metro-boq.md`。
+
 ## 支持文件格式
 
 - `.xlsx`、`.xls`、`.csv`

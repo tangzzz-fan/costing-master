@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.7.0 — 2026-10-18
+
+- 新增 `references/metro-rail-transit.md`：地铁车站/盾构清单特征、合同风险、变更索赔、材料调差、进度/结算和江浙沪计价依据
+- 新增 `input-specs/metro-boq.md`
+- 新增 `templates/metro-boq-feature-check-table.md`、`templates/metro-claim-evidence-checklist.md`
+- 新增 `workflows/metro-rail-transit-audit.md`
+- 苏州地铁测试场景接入工作流和回归矩阵
+- `standards-index`、`region-jiangsu-shanghai-zhejiang`、`software-and-quotas` 等增加城市轨道交通专项索引和交叉引用
+- SKILL/README/测试矩阵同步
+
 ## v0.6.0 — 2026-10-18
 
 - 新增 `workflows/pricing-and-bid-review.md`：预算/最高投标限价、投标报价分析、清标澄清工作流

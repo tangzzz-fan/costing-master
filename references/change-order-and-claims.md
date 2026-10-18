@@ -1,5 +1,7 @@
 # 工程变更、签证与索赔
 
+> 地铁/轨道交通变更索赔证据链另见 `references/metro-rail-transit.md` 和 `templates/metro-claim-evidence-checklist.md`。
+
 ## 一、工程变更
 
 ### 1.1 变更类型

@@ -10,7 +10,7 @@ description: |
   组价、算量指标、新旧标准混用、目标成本。
   不用于海外计价规则、国际合同范本、非造价维度法律解释，且不替代签章、评标或法律意见。
 metadata:
-  version: "0.6.0"
+  version: "0.7.0"
 ---
 
 # 造价大师 Costing Master
@@ -80,6 +80,7 @@ metadata:
 | 合同、招标文件、Word/PDF 条款 | `input-specs/contract-word-pdf.md` | 合同风险、评标办法、付款与调价 |
 | 结算书、结算汇总表 | `input-specs/settlement-book.md` | 结算审核、审减台账、付款扣回 |
 | 签证单、变更单、现场证据 | `input-specs/change-visa.md` | 变更签证审核、证据链检查 |
+| 地铁/轨道交通清单、车站和盾构计价表 | `input-specs/metro-boq.md` | 地铁清单特征、工程量、变更和结算 |
 | 材料价格表、信息价、询价单 | `input-specs/material-price-table.md` | 材料调差、价格异常分析 |
 
 ### 通用抽取字段
@@ -104,6 +105,7 @@ metadata:
 | 用含量指标反查 GTJ/GCCP 算量合理性 | `workflows/quantity-indicator-check.md` |
 | 目标成本、动态成本、成本偏差、管理层摘要 | `workflows/cost-management.md` |
 | 综合单价组价、预算编制、投标报价分析、清标分析 | `workflows/pricing-and-bid-review.md` |
+| 地铁/轨道交通车站、盾构、变更索赔和结算审核 | `workflows/metro-rail-transit-audit.md` |
 | 所有复杂任务交付前质检 | `workflows/second-pass-review.md` |
 
 ## Reference 导航
@@ -112,6 +114,7 @@ metadata:
 |---|---|
 | 标准、法规与计价依据索引（含核对状态） | `references/standards-index.md` |
 | 江苏/上海/浙江地区资料与执行时间 | `references/region-jiangsu-shanghai-zhejiang.md` |
+| 地铁/轨道交通车站、盾构和变更索赔审核 | `references/metro-rail-transit.md` |
 | GB/T 50500-2024 新旧对比、条款摘要 | `references/gbt50500-2024.md` |
 | 清单编制、综合单价、不平衡报价 | `references/boq-and-pricing.md` |
 | 清单特征、漏项、异常检查规则 | `references/boq-check-rules.md` |
@@ -148,6 +151,8 @@ metadata:
 | 目标成本测算表 | `templates/target-cost-estimate.md` |
 | 投标报价分析表 | `templates/bid-price-analysis-table.md` |
 | 清标澄清问题清单 | `templates/clearance-question-list.md` |
+| 地铁清单特征检查表 | `templates/metro-boq-feature-check-table.md` |
+| 地铁变更索赔证据清单 | `templates/metro-claim-evidence-checklist.md` |
 | 算量指标反查表 | `templates/quantity-indicator-check-table.md` |
 | 需补资料清单 | `templates/need-more-documents-list.md` |
 | 管理层摘要 | `templates/management-summary.md` |
