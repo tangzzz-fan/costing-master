@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.0 — 2026-10-18
+
+- 新增 `workflows/pricing-and-bid-review.md`：预算/最高投标限价、投标报价分析、清标澄清工作流
+- 新增 `templates/bid-price-analysis-table.md`、`templates/clearance-question-list.md`
+- 新增 `test-cases/pricing-and-bid-review.case.md`、`examples/pricing-and-bid-review-example.md`
+- `references/boq-and-pricing.md` 增加工作流和清标模板导航
+- SKILL/README/测试用例矩阵同步
+
 ## v0.5.0 — 2026-10-18
 
 - 新增 `workflows/cost-management.md`：目标成本、动态成本、成本偏差和管理层摘要工作流

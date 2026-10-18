@@ -1,6 +1,6 @@
 # 工程量清单编制与综合单价分析
 
-> 本文件侧重工程量清单编制、综合单价组价和不平衡报价；费用组成和取费口径详见 `references/fee-composition.md`。
+> 本文件侧重工程量清单编制、综合单价组价和不平衡报价；费用组成和取费口径详见 `references/fee-composition.md`。复杂组价、预算、投标报价或清标任务按 `workflows/pricing-and-bid-review.md` 执行，并走二次审核。
 
 ## 一、工程量清单编制
 
@@ -205,6 +205,8 @@
 5. 对明显不合理且无合理解释的报价，由评标委员会按招标文件规定的评标办法处理
 
 *注：上述为GB/T 50500-2024的原则性规定，具体处置标准、偏离阈值、处理程序以项目招标文件中的评标办法为准。本Skill不替代招标文件或评标委员会的判断。*
+
+> 复杂清标任务按 `workflows/pricing-and-bid-review.md` 执行，输出 `templates/clearance-question-list.md` 和 `templates/bid-price-analysis-table.md`。
 
 ---
 

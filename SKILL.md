@@ -10,7 +10,7 @@ description: |
   组价、算量指标、新旧标准混用、目标成本。
   不用于海外计价规则、国际合同范本、非造价维度法律解释，且不替代签章、评标或法律意见。
 metadata:
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # 造价大师 Costing Master
@@ -103,7 +103,7 @@ metadata:
 | 审核进度款、预付款扣回、质保金 | `workflows/progress-payment-audit.md` |
 | 用含量指标反查 GTJ/GCCP 算量合理性 | `workflows/quantity-indicator-check.md` |
 | 目标成本、动态成本、成本偏差、管理层摘要 | `workflows/cost-management.md` |
-| 综合单价组价、预算编制、投标报价分析、清标分析 | 无独立 workflow；按 `references/boq-and-pricing.md`、`references/fee-composition.md`、`templates/comprehensive-unit-price-analysis.md` 执行，并走二次审核 |
+| 综合单价组价、预算编制、投标报价分析、清标分析 | `workflows/pricing-and-bid-review.md` |
 | 所有复杂任务交付前质检 | `workflows/second-pass-review.md` |
 
 ## Reference 导航
@@ -146,6 +146,8 @@ metadata:
 | 进度款审核表 | `templates/progress-payment-audit-table.md` |
 | 成本偏差分析表 | `templates/cost-variance-analysis-table.md` |
 | 目标成本测算表 | `templates/target-cost-estimate.md` |
+| 投标报价分析表 | `templates/bid-price-analysis-table.md` |
+| 清标澄清问题清单 | `templates/clearance-question-list.md` |
 | 算量指标反查表 | `templates/quantity-indicator-check-table.md` |
 | 需补资料清单 | `templates/need-more-documents-list.md` |
 | 管理层摘要 | `templates/management-summary.md` |

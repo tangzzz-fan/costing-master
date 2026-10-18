@@ -8,6 +8,7 @@
 |---|---|---|---|
 | `workflows/settlement-audit.md` | `test-cases/settlement-audit.case.md` | `examples/settlement-audit-example.md` | 结算组成、审减证据、规费/增值税口径、质保金扣回 |
 | `workflows/cost-management.md` | `test-cases/cost-management.case.md` | `examples/cost-management-example.md` | 目标/合同/动态/结算成本分列、偏差闭合、未确认变更单列 |
+| `workflows/pricing-and-bid-review.md` | `test-cases/pricing-and-bid-review.case.md` | `examples/pricing-and-bid-review-example.md` | 组价边界、不平衡报价、清标问题、不代替评标 |
 | `workflows/boq-missing-items-check.md` | `test-cases/boq-feature-missing.case.md` | `examples/boq-check-example.md` | 特征缺失、疑似漏项、量价交叉验证、不直接组价 |
 | `workflows/contract-risk-review.md` | `test-cases/contract-risk.case.md` | `examples/contract-risk-example.md` | 风险分级、条款引用、不做法定性 |
 | `workflows/change-visa-audit.md` | `test-cases/duplicate-visa.case.md` | `examples/change-visa-example.md` | 重复计取、证据链、书面指令、人工确认 |
