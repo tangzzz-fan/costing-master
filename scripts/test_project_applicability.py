@@ -6,7 +6,7 @@
 数据来源：真实公开的江苏、上海、浙江住建部门通知和模拟项目信息
 测试用例：test-cases/project-applicability.case.md
 
-关联规则：R-008（标准变动检查）、R-009（地区资料核对）
+关联规则：R-009（标准和地方规则新鲜度）、R-013（地区优先级与跨地区隔离）
 """
 
 from datetime import datetime
