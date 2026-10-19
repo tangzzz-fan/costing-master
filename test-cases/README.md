@@ -34,6 +34,9 @@
 | 标准变动与地方执行 | `test-cases/standard-change.case.md` | 真实公开标准/地方通知（江苏/苏州 + 浙江） | 标准版本识别、地方执行时间、合同日期划断、影响矩阵、测试更新 |
 | Excel 输出 | `test-cases/excel-output.case.md` | 真实公开项目框架 + 现有测试证据（成本细节为模拟） | 工作簿结构、公式、证据列、判断等级、版本与签认边界 |
 | 规则调用治理 | `test-cases/rule-governance.case.md` | 真实公开项目框架 + 仓库规则登记（成本细节为模拟） | 任务清单、规则 ID、preflight/postflight、规则覆盖率、人工 gate |
+| 项目标准适用性判断 | `test-cases/project-applicability.case.md` | 模拟（基于真实地方通知和执行时间） | 江浙沪执行时间、招标/合同日期划断、边界日期处理、国有/非国有资金适用 |
+| 地铁工程量校核公式验证 | `test-cases/metro-quantity-check.case.md` | 真实公开（MQ-03/04）+ 模拟（MQ-01/02/05，基于真实车站规模） | 公式准确性、误差分析、适用边界、修正系数、使用原则 |
+| 标准文本验证 | `test-cases/standards-verification.case.md` | 真实公开官方文件待核对 | 标准编号、名称、日期、官方来源、链接可访问性、地方文号验证 |
 
 ## 回归约定
 
