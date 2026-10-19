@@ -134,6 +134,7 @@ metadata:
 | 文件抽取、证据索引和资料可靠性 | `references/file-extraction-and-evidence.md` |
 | 评估、回归和质量指标 | `references/evaluation-and-regression.md` |
 | 企业级交付、审核记录和签认边界 | `references/enterprise-delivery.md` |
+| 版本兼容、升级步骤和回滚 | `references/version-compatibility.md` |
 | Excel 输出、工作簿结构和公式规范 | `references/excel-output-guide.md` |
 | GB/T 50500-2024 新旧对比、条款摘要 | `references/gbt50500-2024.md` |
 | 清单编制、综合单价、不平衡报价 | `references/boq-and-pricing.md` |

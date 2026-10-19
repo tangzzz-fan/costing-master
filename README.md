@@ -91,6 +91,7 @@ costing-master/
 │   ├── file-extraction-and-evidence.md
 │   ├── evaluation-and-regression.md
 │   ├── enterprise-delivery.md
+│   ├── version-compatibility.md
 │   ├── excel-output-guide.md
 │   ├── gbt50500-2024.md
 │   ├── boq-and-pricing.md
@@ -123,6 +124,7 @@ costing-master/
 ├── workflows/
 ├── templates/
 ├── examples/
+├── docs/
 └── test-cases/
 ```
 
