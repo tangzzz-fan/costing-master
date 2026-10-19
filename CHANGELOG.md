@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.13.0 — 2026-10-19
+
+- 新增 `scripts/metro_quantity_estimator.py`：地铁车站和盾构区间工程量快速估算，输出 11 项车站工程量和 5 项区间工程量，并与设计值对比误差
+- 新增 `scripts/test_project_applicability.py`：按招标公告或合同日期判断江浙沪项目适用的国家标准和地方规则，8 个场景断言
+- 新增 `scripts/test_metro_quantity.py`：地铁工程量校核公式验证，5 个公式误差断言和适用边界说明
+- 新增 `scripts/check_unit_price_data.py`：单价样本 CSV 校验、参考区间计算和异常样本标记，支持 `--template` 打印表头
+- 新增 `scripts/test_unit_price_data.py`：单价校验逻辑 9 项断言，数据取自单价收集指南示例
+- 新增 `references/negotiation-strategy.md`：谈判准备、9 类争议点应对、话术模板和 2 个教学示例案例
+- 新增 `江浙沪单价数据收集指南.md`：数据来源、抽取步骤、参照区间口径、质量控制和任务安排
+- 新增 `第一阶段进展报告.md` 和 `全部任务完成总结报告.md`
+- 补全 `test-cases/project-applicability.case.md`、`test-cases/metro-quantity-check.case.md`、`test-cases/standards-verification.case.md` 的数据来源、期望行为和失败表现章节
+- `scripts/eval_workflows.py` 增加地区适用性断言和工程量公式断言两步，新增步骤摘要输出
+- CI 由四步扩展为七步，增加规则治理、地区适用性断言、工程量公式断言和运行并发取消
+- `rules/rule-registry.json` 补齐 3 个测试用例的规则覆盖，规则测试、workflow 和测试用例覆盖率均为 100%
+- 核实标准日期：GB/T 50500-2024 为住建部公告 2024 年第 212 号，签发 2024-11-26，住建部官网发布 2024-12-30，2025-09-01 实施
+- 核实地方文件日期：江苏省住建厅公告〔2025〕第12号落款 2025-12-19，官网发布 2025-12-22，2026-06-01 实施，同时废止苏建价〔2014〕448 号
+- 修正 `test-cases/metro-unit-price-data.template.md` 和 `审核报告-标准与地区资料.md` 的重复标题
+- 谈判案例标注为教学示例，修正案例内金额口径和公告年份
+- 单价指南的参考区间标注为经验区间，待真实样本替换
+- 统一测试脚本 docstring 的规则 ID 与 `rules/rule-registry.json`
+- 忽略本地 `.workbuddy/` 记忆目录
+- bump version 0.13.0
+
 ## v0.12.0 — 2026-10-19
 
 - 新增 `rules/rule-registry.json`：登记 14 条规则，包含规则 ID、来源、状态、生效日期、关联 workflow/reference/template/test、执行方式和审核人
