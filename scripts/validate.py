@@ -14,6 +14,7 @@ Checks:
 - code fences are balanced
 - Excel CSV templates exist with the expected UTF-8 BOM and headers
 - no emoji icons in repository text files
+- rule registry and task manifest checks are in scripts/check_rule_governance.py
 """
 
 from __future__ import annotations
@@ -145,7 +146,8 @@ def check_frontmatter() -> None:
 
 def check_paths() -> None:
     path_pattern = re.compile(
-        r"`((?:references|workflows|templates|input-specs|examples|test-cases)/"
+        r"`((?:references|workflows|templates|input-specs|examples|test-cases|"
+        r"rules|hooks)/"
         r"[^`\s]+\.md)`"
     )
     link_pattern = re.compile(r"\[[^\]]*\]\(([^)]+)\)")

@@ -6,6 +6,8 @@
 .idea/
 outputs/
 .superpowers/
+__pycache__/
+*.pyc
 *.xlsx
 *.pdf
 *.rar

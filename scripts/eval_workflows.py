@@ -77,6 +77,16 @@ def load_registry() -> dict | None:
         return None
 
 
+def load_rule_registry() -> dict | None:
+    path = ROOT / "rules" / "rule-registry.json"
+    if not path.exists():
+        return None
+    try:
+        return json.loads(read(path))
+    except json.JSONDecodeError:
+        return None
+
+
 def parse_date(value: object) -> date | None:
     if not isinstance(value, str) or not value:
         return None
@@ -189,6 +199,49 @@ def main() -> int:
     workflow_names = {p.name for p in workflows}
     case_names = {p.name for p in cases}
 
+    rule_registry = load_rule_registry()
+    raw_rules = (
+        rule_registry.get("rules", [])
+        if isinstance(rule_registry, dict)
+        else []
+    )
+    rules = (
+        [rule for rule in raw_rules if isinstance(rule, dict)]
+        if isinstance(raw_rules, list)
+        else []
+    )
+    active_rules = [
+        rule
+        for rule in rules
+        if isinstance(rule, dict) and rule.get("status") == "active"
+    ]
+    rules_with_tests = sum(1 for rule in active_rules if rule.get("tests"))
+    covered_workflows = {
+        Path(path).name
+        for rule in active_rules
+        for path in rule.get("workflows", [])
+        if isinstance(path, str)
+    }
+    covered_cases = {
+        Path(path).name
+        for rule in active_rules
+        for path in rule.get("tests", [])
+        if isinstance(path, str)
+    }
+    rule_test_coverage = (
+        100.0 * rules_with_tests / len(active_rules) if active_rules else 0.0
+    )
+    rule_workflow_coverage = (
+        100.0 * len(workflow_names & covered_workflows) / len(workflow_names)
+        if workflow_names
+        else 100.0
+    )
+    rule_case_coverage = (
+        100.0 * len(case_names & covered_cases) / len(case_names)
+        if case_names
+        else 100.0
+    )
+
     workflow_coverage = (
         100.0
         if not workflow_names
@@ -216,6 +269,9 @@ def main() -> int:
     standard_change_ok, standard_change_output = run_step(
         "standard-change", ["scripts/test_standard_change.py"]
     )
+    rule_ok, rule_output = run_step(
+        "rules", ["scripts/check_rule_governance.py"]
+    )
 
     gaps: list[str] = []
     freshness, freshness_gaps = standard_freshness(load_registry())
@@ -239,6 +295,21 @@ def main() -> int:
         gaps.append("test_scenarios.py failed")
     if not standard_change_ok:
         gaps.append("test_standard_change.py failed")
+    if rule_registry is None:
+        gaps.append("rules/rule-registry.json missing or invalid")
+    if rule_test_coverage < 100:
+        gaps.append(
+            "rule test coverage gap: "
+            f"{rules_with_tests}/{len(active_rules)} active rules have tests"
+        )
+    if rule_workflow_coverage < 100:
+        missing = sorted(workflow_names - covered_workflows)
+        gaps.append("rule workflow coverage gap: " + ", ".join(missing))
+    if rule_case_coverage < 100:
+        missing = sorted(case_names - covered_cases)
+        gaps.append("rule test case coverage gap: " + ", ".join(missing))
+    if not rule_ok:
+        gaps.append("check_rule_governance.py failed")
 
     status = "PASS" if not gaps else "FAIL"
     report_lines = [
@@ -253,6 +324,7 @@ def main() -> int:
         "| Item | Count |",
         "|---|---:|",
         f"| Workflows | {len(workflows)} |",
+        f"| Rules | {len(rules)} |",
         f"| Test cases | {len(cases)} |",
         f"| Examples | {len(examples)} |",
         f"| References | {len(references)} |",
@@ -268,6 +340,9 @@ def main() -> int:
         f"| Workflow coverage | 100% | {workflow_coverage:.0f}% | {'PASS' if workflow_coverage == 100 else 'FAIL'} |",
         f"| Test case listing | 100% | {case_listing:.0f}% | {'PASS' if case_listing == 100 else 'FAIL'} |",
         f"| Data source declaration | 100% | {source_coverage:.0f}% | {'PASS' if source_coverage == 100 else 'FAIL'} |",
+        f"| Rule test coverage | 100% | {rule_test_coverage:.0f}% | {'PASS' if rule_test_coverage == 100 else 'FAIL'} |",
+        f"| Rule workflow coverage | 100% | {rule_workflow_coverage:.0f}% | {'PASS' if rule_workflow_coverage == 100 else 'FAIL'} |",
+        f"| Rule test case coverage | 100% | {rule_case_coverage:.0f}% | {'PASS' if rule_case_coverage == 100 else 'FAIL'} |",
         "",
         "## Data Sources",
         "",
@@ -298,6 +373,7 @@ def main() -> int:
             f"| validate.py | {'PASS' if validate_ok else 'FAIL'} | {one_line(validate_output)} |",
             f"| test_scenarios.py | {'PASS' if scenario_ok else 'FAIL'} | {one_line(scenario_output)} |",
             f"| test_standard_change.py | {'PASS' if standard_change_ok else 'FAIL'} | {one_line(standard_change_output)} |",
+            f"| check_rule_governance.py | {'PASS' if rule_ok else 'FAIL'} | {one_line(rule_output)} |",
             "",
             "## Gaps",
             "",

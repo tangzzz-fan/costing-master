@@ -42,6 +42,7 @@
 | 质量评估与回归 | 覆盖率、数据来源、CI 四步、质量报告 | `references/evaluation-and-regression.md`、`scripts/eval_workflows.py`、`templates/quality-report.md` | 已实现 |
 | 企业级交付 | 角色分离、交付包、审核记录、审计轨迹、签认边界、归档 | `workflows/enterprise-delivery.md`、`references/enterprise-delivery.md`、`templates/delivery-package.md`、`templates/review-record.md` | 已实现 |
 | Excel 输出 | 多 sheet 工作簿、公式、证据列、判断等级、台账模板 | `references/excel-output-guide.md`、`templates/excel/README.md` | 已实现 |
+| 规则调用治理 | 规则 ID、任务清单、preflight/postflight、规则覆盖率、人工 gate | `rules/README.md`、`templates/task-manifest.md`、`scripts/check_rule_governance.py` | 已实现 |
 
 ## 三、不适用与边界
 
@@ -63,5 +64,7 @@
 
 - `README.md`：项目定位、安装、目录结构。
 - `SKILL.md`：触发词、使用原则、workflow/reference/template 导航。
+- `rules/README.md`：规则登记、任务清单、preflight/postflight 和规则覆盖率。
+- `hooks/README.md`：可选的 Claude Code hooks 示例。
 - `ROADMAP.md`：版本计划和人工审核 gate。
 - `test-cases/README.md`：测试覆盖矩阵和数据来源规则。

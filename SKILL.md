@@ -10,7 +10,7 @@ description: |
   组价、算量指标、新旧标准混用、目标成本。
   不用于海外计价规则、国际合同范本、非造价维度法律解释，且不替代签章、评标或法律意见。
 metadata:
-  version: "0.11.0"
+  version: "0.12.0"
 ---
 
 # 造价大师 Costing Master
@@ -32,6 +32,18 @@ metadata:
 7. **区分工作模式**：未上传地区资料时，只输出参考区间、风险提示和需补资料清单；上传地区资料和项目文件后，可进入预算、报价校核、结算审核、材料调差等项目工作模式。
 8. **交付前二次审核**：复杂任务完成后，必须按 `workflows/second-pass-review.md` 对初稿进行质检，再输出最终成果或修正建议。
 9. **标准与依据可追溯**：标准、法规、计价依据和官方来源统一登记在 `references/standards-index.md`；引用前核对其状态和最近核对日期，项目合同和地方现行文件优先。
+
+## 规则调用治理
+
+复杂任务（涉及金额、审核意见、报价、交付包或标准适用）必须执行：
+
+1. 读取 `rules/README.md`，按任务类型选择规则，并复制 `templates/task-manifest.md` 建立任务清单。
+2. 在任务清单中记录规则 ID、workflow、reference、template、证据编号、判断等级和人工确认点。
+3. 输出前执行 `workflows/second-pass-review.md`，并生成 `质检摘要.md`。
+4. 运行 `python3 scripts/check_rule_governance.py`，检查规则登记、路径和覆盖率；`scripts/eval_workflows.py` 也会调用该检查。
+5. 未记录规则 ID、未完成二次审核的成果只能作为草稿，不得标记为可交付签章。
+
+规则登记以 `rules/rule-registry.json` 为准；规则变更、废止和覆盖率要求见 `rules/README.md`。可选的 Claude Code hooks 见 `hooks/README.md`。
 
 ## 基准资料优先级
 
@@ -115,6 +127,7 @@ metadata:
 
 | 需求 | Reference |
 |---|---|
+| 规则调用治理、任务清单和规则登记 | `rules/README.md` |
 | 标准、法规与计价依据索引（含核对状态） | `references/standards-index.md` |
 | 江苏/上海/浙江地区资料与执行时间 | `references/region-jiangsu-shanghai-zhejiang.md` |
 | 地铁/轨道交通车站、盾构和变更索赔审核 | `references/metro-rail-transit.md` |
@@ -145,6 +158,7 @@ metadata:
 
 | 成果 | 模板 |
 |---|---|
+| 复杂任务规则清单 | `templates/task-manifest.md` |
 | 结算审核报告 | `templates/settlement-audit-report.md` |
 | 审减/审增问题台账 | `templates/settlement-deduction-register.md` |
 | 清单特征检查表 | `templates/boq-feature-check-table.md` |

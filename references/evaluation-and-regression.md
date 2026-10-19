@@ -29,7 +29,8 @@
 - 数据来源声明率：100%，每个 `test-cases/*.case.md` 必须有 `## 数据来源`。
 - 真实数据用例：每个新增功能版本至少一个，使用公开项目资料、真实标准或脱敏实际文件。
 - 确定性断言：覆盖进度款、材料调差、结算差异等可计算逻辑；断言失败必须阻断 CI。
-- CI 通过率：结构校验、业务断言、评估报告三步全部通过。
+- CI 通过率：结构校验、业务断言、标准变动断言、规则治理检查和评估报告全部通过。
+- 规则覆盖率：active 规则有测试的比例、workflow 被规则覆盖的比例、测试用例被规则覆盖的比例均达到 100%。
 - 语义质量：由人工按用例的“期望行为/失败表现”验收，不能由 CI 完全替代。
 
 ## 四、回归触发条件
@@ -44,10 +45,12 @@
 
 1. 运行 `python3 scripts/validate.py`。
 2. 运行 `python3 scripts/test_scenarios.py`。
-3. 运行 `python3 scripts/eval_workflows.py`。
-4. 按受影响的用例做人工语义验收，重点看证据链、结论强度和缺资料降级。
-5. 更新 `CHANGELOG.md`、版本号和 `test-cases/README.md`。
-6. 由人工审核人签认后发布。
+3. 运行 `python3 scripts/test_standard_change.py`。
+4. 运行 `python3 scripts/check_rule_governance.py`，确认规则路径、任务清单和覆盖率。
+5. 运行 `python3 scripts/eval_workflows.py`。
+6. 按受影响的用例做人工语义验收，重点看证据链、结论强度和缺资料降级。
+7. 更新 `CHANGELOG.md`、版本号和 `test-cases/README.md`。
+8. 由人工审核人签认后发布。
 
 ## 六、质量报告
 
@@ -55,7 +58,8 @@
 
 - 评估范围、版本、日期、数据来源。
 - workflow 覆盖率、数据来源声明率、真实数据用例数、确定性断言数。
-- CI 三步结果。
+- 规则总数、active 规则测试覆盖率、workflow 规则覆盖率和测试用例规则覆盖率。
+- CI 四步结果和规则治理检查结果。
 - 失败用例、未覆盖项和缺口。
 - 人工审核点、结论和签认。
 
@@ -69,17 +73,17 @@
 
 ## 八、规则调用治理
 
-随着 reference、template、测试和历史项目增加，仅靠 SKILL.md 的文字提醒，不能保证每条规则都被调用。建议逐步增加以下控制点：
+随着 reference、template、测试和历史项目增加，仅靠 SKILL.md 的文字提醒，不能保证每条规则都被调用。v0.12.0 已落地以下控制点：
 
 | 控制点 | 作用 | 落地方式 |
 |---|---|---|
-| 规则登记 | 每条规则有唯一 ID、来源、适用范围、生效日期、关联 workflow/template/test、审核状态 | `rules-index.md` 或 `rules-registry.json` |
-| 任务清单 | 每个任务记录使用的 workflow、reference、template、规则 ID 和输出成果 | 任务开始时生成 `task-manifest`，交付时随包保存 |
-| Preflight 路由 | 按任务类型选择必须执行的 workflow 和必须检查的规则 | SKILL.md 路由表 + 任务前检查清单 |
-| Postflight 校验 | 检查输出是否有必需章节、证据编号、计算闭合、质检摘要和规则清单 | 校验脚本/模板契约，不靠模型自觉 |
-| Hooks | 在用户提交任务、写文件或结束回复前注入检查或阻断 | Claude Code hooks（UserPromptSubmit/PreToolUse/Stop） |
-| 测试覆盖 | 每条规则至少对应一个测试用例；规则变更触发回归 | 规则覆盖率指标 + CI |
-| 检索/索引 | 历史资料增长后，不全量加载，按任务检索相关 reference | 索引、标签、检索脚本或知识库 |
+| 规则登记 | 每条规则有唯一 ID、来源、适用范围、生效日期、关联 workflow/template/test、审核状态 | `rules/rule-registry.json`、`rules/README.md` |
+| 任务清单 | 每个任务记录使用的 workflow、reference、template、规则 ID 和输出成果 | `templates/task-manifest.md`；任务开始时生成，交付时随包保存 |
+| Preflight 路由 | 按任务类型选择必须执行的 workflow 和必须检查的规则 | SKILL.md 路由表 + 任务清单 + `hooks/preflight_reminder.py` |
+| Postflight 校验 | 检查输出是否有必需章节、证据编号、计算闭合、质检摘要和规则清单 | `scripts/check_rule_governance.py` + 模板契约 |
+| Hooks | 在用户提交任务、写文件或结束回复前注入检查或阻断 | `hooks/README.md`、`hooks/settings.example.json` |
+| 测试覆盖 | 每条规则至少对应一个测试用例；规则变更触发回归 | `scripts/check_rule_governance.py` + `scripts/eval_workflows.py` |
+| 检索/索引 | 历史资料增长后，不全量加载，按任务检索相关 reference | 规则字段、任务类型路由和规则 ID 反查 |
 | 人工 gate | 高风险规则、标准适用、交付签认必须人工确认 | 二次审核、企业级交付、签认记录 |
 
 原则：
@@ -89,13 +93,17 @@
 - 规则变更要有影响矩阵、测试和版本记录；旧规则要标记废止。
 - 规则覆盖率、数据来源、标准新鲜度和交付签认应进入质量报告。
 
-该治理建议列入 v0.12.0。
+v0.12.0 的验收标准：规则登记路径有效；active 规则测试覆盖率、workflow 覆盖率和测试用例覆盖率均为 100%；任务清单模板包含必需章节；规则治理检查由 CI 的评估步骤执行。
 
 ## 九、关联文件
 
 - `scripts/validate.py`
 - `scripts/test_scenarios.py`
+- `scripts/check_rule_governance.py`
 - `scripts/eval_workflows.py`
+- `rules/rule-registry.json`
+- `rules/README.md`
+- `templates/task-manifest.md`
 - `templates/quality-report.md`
 - `test-cases/README.md`
 - `test-cases/fixtures/suzhou-metro-viii-ts-08/scenario.json`

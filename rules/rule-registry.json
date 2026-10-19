@@ -1,0 +1,341 @@
+{
+  "version": "0.12.0",
+  "last_reviewed": "2026-10-19",
+  "rules": [
+    {
+      "id": "R-001",
+      "title": "缺资料先列清单",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "SKILL.md 使用原则 2",
+      "workflows": [
+        "workflows/settlement-audit.md",
+        "workflows/boq-missing-items-check.md",
+        "workflows/document-extraction-and-evidence.md"
+      ],
+      "references": [
+        "references/file-extraction-and-evidence.md",
+        "references/audit-and-settlement.md"
+      ],
+      "templates": [
+        "templates/need-more-documents-list.md"
+      ],
+      "tests": [
+        "test-cases/settlement-audit.case.md",
+        "test-cases/document-extraction-and-evidence.case.md",
+        "test-cases/boq-feature-missing.case.md"
+      ],
+      "enforcement": "checklist+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-002",
+      "title": "证据可追溯",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "SKILL.md 使用原则 3",
+      "workflows": [
+        "workflows/settlement-audit.md",
+        "workflows/change-visa-audit.md",
+        "workflows/document-extraction-and-evidence.md",
+        "workflows/quantity-indicator-check.md"
+      ],
+      "references": [
+        "references/file-extraction-and-evidence.md"
+      ],
+      "templates": [
+        "templates/evidence-index.md"
+      ],
+      "tests": [
+        "test-cases/settlement-audit.case.md",
+        "test-cases/document-extraction-and-evidence.case.md",
+        "test-cases/enterprise-delivery.case.md",
+        "test-cases/rebar-indicator.case.md"
+      ],
+      "enforcement": "script+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-003",
+      "title": "禁止凭空造价",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "SKILL.md 使用原则 4",
+      "workflows": [
+        "workflows/pricing-and-bid-review.md",
+        "workflows/boq-missing-items-check.md"
+      ],
+      "references": [
+        "references/boq-and-pricing.md",
+        "references/software-and-quotas.md"
+      ],
+      "templates": [
+        "templates/comprehensive-unit-price-analysis.md"
+      ],
+      "tests": [
+        "test-cases/unit-price-analysis.case.md",
+        "test-cases/pricing-and-bid-review.case.md",
+        "test-cases/boq-feature-missing.case.md"
+      ],
+      "enforcement": "script+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-004",
+      "title": "判断等级和结论强度",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "SKILL.md 使用原则 5",
+      "workflows": [
+        "workflows/second-pass-review.md",
+        "workflows/settlement-audit.md",
+        "workflows/change-visa-audit.md",
+        "workflows/cost-management.md"
+      ],
+      "references": [
+        "references/audit-and-settlement.md"
+      ],
+      "templates": [
+        "templates/settlement-deduction-register.md"
+      ],
+      "tests": [
+        "test-cases/duplicate-visa.case.md",
+        "test-cases/settlement-audit.case.md",
+        "test-cases/cost-management.case.md"
+      ],
+      "enforcement": "checklist+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-005",
+      "title": "2024 版费用和增值税口径",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "references/gbt50500-2024.md、references/fee-composition.md",
+      "workflows": [
+        "workflows/settlement-audit.md",
+        "workflows/progress-payment-audit.md",
+        "workflows/pricing-and-bid-review.md"
+      ],
+      "references": [
+        "references/gbt50500-2024.md",
+        "references/fee-composition.md"
+      ],
+      "templates": [],
+      "tests": [
+        "test-cases/settlement-audit.case.md",
+        "test-cases/standard-transition.case.md",
+        "test-cases/progress-payment.case.md",
+        "test-cases/pricing-and-bid-review.case.md"
+      ],
+      "enforcement": "checklist+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-006",
+      "title": "材料调差只调风险幅度外部分",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "references/material-price-adjustment.md",
+      "workflows": [
+        "workflows/material-price-analysis.md"
+      ],
+      "references": [
+        "references/material-price-adjustment.md"
+      ],
+      "templates": [
+        "templates/material-price-adjustment-table.md"
+      ],
+      "tests": [
+        "test-cases/material-adjustment.case.md",
+        "test-cases/suzhou-metro-station.case.md"
+      ],
+      "enforcement": "script+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-007",
+      "title": "变更签证和索赔证据链",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "references/change-order-and-claims.md",
+      "workflows": [
+        "workflows/change-visa-audit.md",
+        "workflows/contract-risk-review.md"
+      ],
+      "references": [
+        "references/change-order-and-claims.md",
+        "references/metro-rail-transit.md"
+      ],
+      "templates": [
+        "templates/change-visa-review-table.md",
+        "templates/metro-claim-evidence-checklist.md"
+      ],
+      "tests": [
+        "test-cases/duplicate-visa.case.md",
+        "test-cases/contract-risk.case.md",
+        "test-cases/suzhou-metro-station.case.md"
+      ],
+      "enforcement": "checklist+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-008",
+      "title": "交付前二次审核",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "SKILL.md 使用原则 8",
+      "workflows": [
+        "workflows/second-pass-review.md"
+      ],
+      "references": [],
+      "templates": [
+        "templates/second-pass-review-report.md"
+      ],
+      "tests": [
+        "test-cases/second-pass-review.case.md"
+      ],
+      "enforcement": "script+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-009",
+      "title": "标准和地方规则新鲜度",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "references/standards-index.md",
+      "workflows": [
+        "workflows/settlement-audit.md",
+        "workflows/metro-rail-transit-audit.md"
+      ],
+      "references": [
+        "references/standards-index.md",
+        "references/region-jiangsu-shanghai-zhejiang.md"
+      ],
+      "templates": [],
+      "tests": [
+        "test-cases/standard-change.case.md",
+        "test-cases/standard-transition.case.md",
+        "test-cases/evaluation-and-regression.case.md",
+        "test-cases/suzhou-metro-station.case.md"
+      ],
+      "enforcement": "script+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-010",
+      "title": "新增功能必须有真实数据测试",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "test-cases/README.md 回归约定",
+      "workflows": [],
+      "references": [
+        "references/evaluation-and-regression.md"
+      ],
+      "templates": [],
+      "tests": [
+        "test-cases/evaluation-and-regression.case.md",
+        "test-cases/standard-change.case.md",
+        "test-cases/document-extraction-and-evidence.case.md",
+        "test-cases/rule-governance.case.md"
+      ],
+      "enforcement": "script+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-011",
+      "title": "AI 不签认，企业交付需人工签认",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "references/enterprise-delivery.md",
+      "workflows": [
+        "workflows/enterprise-delivery.md"
+      ],
+      "references": [
+        "references/enterprise-delivery.md"
+      ],
+      "templates": [
+        "templates/review-record.md",
+        "templates/delivery-package.md"
+      ],
+      "tests": [
+        "test-cases/enterprise-delivery.case.md",
+        "test-cases/contract-risk.case.md"
+      ],
+      "enforcement": "checklist+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-012",
+      "title": "文件抽取和 OCR/DWG 能力边界",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "references/file-extraction-and-evidence.md",
+      "workflows": [
+        "workflows/document-extraction-and-evidence.md",
+        "workflows/metro-rail-transit-audit.md"
+      ],
+      "references": [
+        "references/file-extraction-and-evidence.md",
+        "references/dwg-cad-handling.md"
+      ],
+      "templates": [
+        "templates/evidence-index.md"
+      ],
+      "tests": [
+        "test-cases/document-extraction-and-evidence.case.md",
+        "test-cases/suzhou-metro-station.case.md"
+      ],
+      "enforcement": "checklist+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-013",
+      "title": "地区优先级与跨地区隔离",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "references/standards-index.md、references/region-jiangsu-shanghai-zhejiang.md",
+      "workflows": [
+        "workflows/metro-rail-transit-audit.md",
+        "workflows/pricing-and-bid-review.md"
+      ],
+      "references": [
+        "references/standards-index.md",
+        "references/region-jiangsu-shanghai-zhejiang.md",
+        "references/market-pricing-fallback.md"
+      ],
+      "templates": [],
+      "tests": [
+        "test-cases/suzhou-metro-station.case.md",
+        "test-cases/standard-change.case.md"
+      ],
+      "enforcement": "checklist+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-014",
+      "title": "Excel 输出公式、证据和签认边界",
+      "status": "active",
+      "effective_date": "2026-10-19",
+      "source": "references/excel-output-guide.md",
+      "workflows": [
+        "workflows/pricing-and-bid-review.md",
+        "workflows/cost-management.md",
+        "workflows/settlement-audit.md",
+        "workflows/progress-payment-audit.md",
+        "workflows/material-price-analysis.md"
+      ],
+      "references": [
+        "references/excel-output-guide.md"
+      ],
+      "templates": [
+        "templates/excel/README.md"
+      ],
+      "tests": [
+        "test-cases/excel-output.case.md"
+      ],
+      "enforcement": "script+manual",
+      "owner": "待人工审核"
+    }
+  ]
+}

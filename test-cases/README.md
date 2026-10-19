@@ -30,9 +30,10 @@
 | 综合单价分析 | `test-cases/unit-price-analysis.case.md` | 模拟/教学 | 套项思路、清单量/定额量、缺资料时不报确定单价 |
 | 苏州地铁车站土建结算 | `test-cases/suzhou-metro-station.case.md` | 真实公开项目框架 + 模拟成本数据 | 地铁车站/盾构、变更签证、材料调差、进度款、结算审核、地区资料 |
 | 混合文件抽取与证据链 | `test-cases/document-extraction-and-evidence.case.md` | 真实公开资料 + 缺失清单 | 文件识别、字段抽取、证据索引、资料完整性、OCR/版本边界 |
-| 评估与回归 | `test-cases/evaluation-and-regression.case.md` | 真实公开 + 现有用例 | 覆盖率、数据来源、CI 三步、质量报告、人工语义审核 |
+| 评估与回归 | `test-cases/evaluation-and-regression.case.md` | 真实公开 + 现有用例 | 覆盖率、数据来源、CI 四步、质量报告、人工语义审核 |
 | 标准变动与地方执行 | `test-cases/standard-change.case.md` | 真实公开标准/地方通知（江苏/苏州 + 浙江） | 标准版本识别、地方执行时间、合同日期划断、影响矩阵、测试更新 |
 | Excel 输出 | `test-cases/excel-output.case.md` | 真实公开项目框架 + 现有测试证据（成本细节为模拟） | 工作簿结构、公式、证据列、判断等级、版本与签认边界 |
+| 规则调用治理 | `test-cases/rule-governance.case.md` | 真实公开项目框架 + 仓库规则登记（成本细节为模拟） | 任务清单、规则 ID、preflight/postflight、规则覆盖率、人工 gate |
 
 ## 回归约定
 
@@ -43,5 +44,7 @@
 - 修改 workflow、template、reference 或 SKILL.md 后，至少回归本矩阵中受影响的用例。
 - 新增 workflow 时，必须同时新增至少一个 `test-cases/*.case.md` 并在本表登记。
 - 校验脚本 `scripts/validate.py` 会检查本表是否覆盖全部 `workflows/*.md`。
+- `scripts/check_rule_governance.py` 会检查规则登记、任务清单章节、规则测试覆盖率、workflow 覆盖率和测试用例覆盖率；`scripts/eval_workflows.py` 会调用该检查。
+- 复杂任务应使用 `templates/task-manifest.md` 记录规则 ID、workflow、证据和人工 gate。
 - 苏州地铁场景的确定性计算由 `scripts/test_scenarios.py` 自动断言；证据分级、结论强度等语义判断仍按用例人工验收。
 - 现有标注“模拟/教学”的用例，将在后续版本逐步补充真实数据用例；新增功能不得只提供模拟数据。

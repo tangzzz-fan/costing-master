@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.12.0 — 2026-10-19
+
+- 新增 `rules/rule-registry.json`：登记 14 条规则，包含规则 ID、来源、状态、生效日期、关联 workflow/reference/template/test、执行方式和审核人
+- 新增 `rules/README.md`：规则生命周期、任务清单、preflight/postflight、hooks、覆盖率、历史资料检索和新增规则流程
+- 新增 `templates/task-manifest.md`：复杂任务规则清单模板，记录规则 ID、使用文件、证据编号、质检和交付状态
+- 新增 `scripts/check_rule_governance.py`：检查规则字段、唯一 ID、日期、路径、任务清单章节、规则测试覆盖率、workflow 覆盖率和测试用例覆盖率
+- `scripts/eval_workflows.py` 集成规则治理检查，质量报告增加规则数、规则测试覆盖率、workflow/测试用例规则覆盖率和 CI 检查行
+- 新增 `hooks/`：可选的 Claude Code preflight/postflight 提醒脚本和示例配置，默认不启用
+- 新增 `test-cases/rule-governance.case.md`，并登记测试覆盖矩阵；规则治理用例纳入 R-010 测试
+- `scripts/validate.py` 支持 `rules/` 和 `hooks/` 路径校验
+- 修正 README 安装地址为当前远程仓库地址
+- 忽略 Python 缓存文件
+- SKILL/README/CAPABILITIES/ROADMAP/质量报告模板同步
+- bump version 0.12.0
+
 ## v0.11.0 — 2026-10-18
 
 - 新增 `references/excel-output-guide.md`：Excel 适用场景、工作簿结构、公式规范、证据列、数据验证和签认边界

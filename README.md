@@ -36,6 +36,7 @@
 | 资料抽取与证据链 | 证据索引、资料完整性清单、需补资料、OCR/版本风险提示 |
 | 企业级交付 | 交付包、审核记录、审计轨迹、签认边界、归档清单 |
 | Excel 输出 | 多 sheet 工作簿结构、公式、证据列、判断等级和台账模板 |
+| 规则调用治理 | 规则 ID、任务清单、规则覆盖率、preflight/postflight 和人工 gate |
 
 ## 不能做什么
 
@@ -67,6 +68,12 @@
 | 禁止交付 | 存在无依据金额、关键计算错误、地区依据缺失却给确定结论等高风险问题 |
 
 质检报告模板见 `templates/second-pass-review-report.md`。
+
+## 规则调用治理
+
+复杂造价任务使用 `rules/README.md` 选择规则，并用 `templates/task-manifest.md` 记录规则 ID、workflow、证据编号和人工确认点。规则登记在 `rules/rule-registry.json`，由 `scripts/check_rule_governance.py` 检查；`scripts/eval_workflows.py` 会把规则覆盖率写入质量报告。可选的 Claude Code hooks 示例见 `hooks/README.md`。
+
+未记录规则 ID、未完成二次审核的成果只能作为草稿，不得标记为可交付签章。
 
 ## 目录结构
 
@@ -103,6 +110,14 @@ costing-master/
 │   ├── zaojia-indicators.md
 │   ├── market-pricing-fallback.md
 │   └── glossary.md
+├── rules/
+│   ├── README.md
+│   └── rule-registry.json
+├── hooks/
+│   ├── README.md
+│   ├── preflight_reminder.py
+│   ├── postflight_check.py
+│   └── settings.example.json
 ├── input-specs/
 ├── workflows/
 ├── templates/
@@ -154,14 +169,14 @@ costing-master/
 
 ```bash
 mkdir -p .claude/skills
-git clone https://github.com/jayden-lg/costing-master.git .claude/skills/costing-master
+git clone https://github.com/tangzzz-fan/costing-master.git .claude/skills/costing-master
 ```
 
 ### 用户级安装
 
 ```bash
 mkdir -p ~/.claude/skills
-git clone https://github.com/jayden-lg/costing-master.git ~/.claude/skills/costing-master
+git clone https://github.com/tangzzz-fan/costing-master.git ~/.claude/skills/costing-master
 ```
 
 ## 开发校验
@@ -170,6 +185,7 @@ git clone https://github.com/jayden-lg/costing-master.git ~/.claude/skills/costi
 python3 scripts/validate.py
 python3 scripts/test_scenarios.py
 python3 scripts/test_standard_change.py
+python3 scripts/check_rule_governance.py
 python3 scripts/eval_workflows.py
 ```
 
@@ -179,7 +195,9 @@ python3 scripts/eval_workflows.py
 
 `test_standard_change.py` 执行苏州/浙江标准变动断言，检查旧版/新版标准、地方规则、招标日期划断和适用性。
 
-`eval_workflows.py` 输出质量报告，统计 workflow 覆盖率、测试用例登记率、数据来源声明率、真实/模拟用例数、标准新鲜度和 CI 四步结果。GitHub Actions 在 push 和 pull request 时自动运行四步。
+`check_rule_governance.py` 检查规则登记、任务清单必需章节、规则测试覆盖率、workflow 覆盖率和测试用例覆盖率。
+
+`eval_workflows.py` 输出质量报告，统计 workflow 覆盖率、测试用例登记率、数据来源声明率、真实/模拟用例数、标准新鲜度、规则治理和 CI 四步结果。GitHub Actions 在 push 和 pull request 时自动运行四步；评估步骤内部同时执行规则治理检查。
 
 仓库约定：正文和模板不使用 emoji 图标；状态标记使用 `[警告]`、`[通过]` 等文字。
 
@@ -195,7 +213,7 @@ python3 scripts/eval_workflows.py
 
 ## 版本路线
 
-当前版本：v0.11.0（详见 `CHANGELOG.md`）。v0.11.0 至 v1.0.0 的详细计划见 `ROADMAP.md`。
+当前版本：v0.12.0（详见 `CHANGELOG.md`）。v0.12.0 至 v1.0.0 的详细计划见 `ROADMAP.md`。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -215,6 +233,7 @@ python3 scripts/eval_workflows.py
 | v0.9.2 | 已发布 | 苏州/浙江标准变动实际场景测试：旧版/新版适用性断言 |
 | v0.10 | 已发布 | 企业级交付：角色分离、交付包、审核记录、审计轨迹和归档 |
 | v0.11 | 已发布 | Excel 输出实践：工作簿结构、公式、证据列和 CSV 模板 |
+| v0.12 | 已发布 | 规则调用治理：规则登记、任务清单、preflight/postflight、hooks 和覆盖率 |
 | v1.0 | 规划 | 企业级文件审核 Skill：可复核台账、报告模板、团队交付规范 |
 
 ## 免责声明
