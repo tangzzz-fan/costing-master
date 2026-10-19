@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -18,9 +22,15 @@ jobs:
           python-version: "3.12"
       - name: Validate skill structure and markdown
         run: python3 scripts/validate.py
+      - name: Check rule registry governance
+        run: python3 scripts/check_rule_governance.py
       - name: Run Suzhou metro scenario business assertions
         run: python3 scripts/test_scenarios.py
       - name: Run standard change assertions
         run: python3 scripts/test_standard_change.py
+      - name: Run project applicability assertions
+        run: python3 scripts/test_project_applicability.py
+      - name: Run metro quantity formula assertions
+        run: python3 scripts/test_metro_quantity.py
       - name: Evaluate coverage and regression status
         run: python3 scripts/eval_workflows.py

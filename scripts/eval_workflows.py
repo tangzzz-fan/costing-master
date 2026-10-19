@@ -25,6 +25,16 @@ def one_line(value: str) -> str:
     return " ".join(value.replace("|", "/").split())
 
 
+def summary_line(value: str, limit: int = 300) -> str:
+    lines = [line.strip() for line in value.splitlines() if line.strip()]
+    text = next(
+        (line for line in reversed(lines) if line.startswith("OK:")),
+        lines[-1] if lines else "",
+    )
+    text = " ".join(text.replace("|", "/").split())
+    return text if len(text) <= limit else text[: limit - 3] + "..."
+
+
 def markdown_files(folder: str) -> list[Path]:
     return sorted((ROOT / folder).glob("*.md"))
 
@@ -269,6 +279,12 @@ def main() -> int:
     standard_change_ok, standard_change_output = run_step(
         "standard-change", ["scripts/test_standard_change.py"]
     )
+    applicability_ok, applicability_output = run_step(
+        "applicability", ["scripts/test_project_applicability.py"]
+    )
+    quantity_ok, quantity_output = run_step(
+        "quantity", ["scripts/test_metro_quantity.py"]
+    )
     rule_ok, rule_output = run_step(
         "rules", ["scripts/check_rule_governance.py"]
     )
@@ -295,6 +311,10 @@ def main() -> int:
         gaps.append("test_scenarios.py failed")
     if not standard_change_ok:
         gaps.append("test_standard_change.py failed")
+    if not applicability_ok:
+        gaps.append("test_project_applicability.py failed")
+    if not quantity_ok:
+        gaps.append("test_metro_quantity.py failed")
     if rule_registry is None:
         gaps.append("rules/rule-registry.json missing or invalid")
     if rule_test_coverage < 100:
@@ -373,6 +393,8 @@ def main() -> int:
             f"| validate.py | {'PASS' if validate_ok else 'FAIL'} | {one_line(validate_output)} |",
             f"| test_scenarios.py | {'PASS' if scenario_ok else 'FAIL'} | {one_line(scenario_output)} |",
             f"| test_standard_change.py | {'PASS' if standard_change_ok else 'FAIL'} | {one_line(standard_change_output)} |",
+            f"| test_project_applicability.py | {'PASS' if applicability_ok else 'FAIL'} | {summary_line(applicability_output)} |",
+            f"| test_metro_quantity.py | {'PASS' if quantity_ok else 'FAIL'} | {summary_line(quantity_output)} |",
             f"| check_rule_governance.py | {'PASS' if rule_ok else 'FAIL'} | {one_line(rule_output)} |",
             "",
             "## Gaps",

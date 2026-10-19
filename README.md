@@ -101,6 +101,7 @@ costing-master/
 │   ├── 13-step-cost-management.md
 │   ├── contract-and-risk.md
 │   ├── change-order-and-claims.md
+│   ├── negotiation-strategy.md
 │   ├── audit-and-settlement.md
 │   ├── material-price-adjustment.md
 │   ├── cost-management.md
@@ -183,9 +184,11 @@ git clone https://github.com/tangzzz-fan/costing-master.git ~/.claude/skills/cos
 
 ```bash
 python3 scripts/validate.py
+python3 scripts/check_rule_governance.py
 python3 scripts/test_scenarios.py
 python3 scripts/test_standard_change.py
-python3 scripts/check_rule_governance.py
+python3 scripts/test_project_applicability.py
+python3 scripts/test_metro_quantity.py
 python3 scripts/eval_workflows.py
 ```
 
@@ -195,9 +198,15 @@ python3 scripts/eval_workflows.py
 
 `test_standard_change.py` 执行苏州/浙江标准变动断言，检查旧版/新版标准、地方规则、招标日期划断和适用性。
 
+`test_project_applicability.py` 按招标或合同日期判断江浙沪项目适用的国家标准和地方规则，覆盖边界日期和跨地区隔离。
+
+`test_metro_quantity.py` 校核地铁车站和盾构区间工程量估算公式，输出与设计值的误差率和适用边界。
+
+`check_unit_price_data.py` 校验单价样本 CSV，按地区和清单项计算最小值、最大值、中位数、平均值和参考区间，并标出异常样本；表头可用 `--template` 打印。
+
 `check_rule_governance.py` 检查规则登记、任务清单必需章节、规则测试覆盖率、workflow 覆盖率和测试用例覆盖率。
 
-`eval_workflows.py` 输出质量报告，统计 workflow 覆盖率、测试用例登记率、数据来源声明率、真实/模拟用例数、标准新鲜度、规则治理和 CI 四步结果。GitHub Actions 在 push 和 pull request 时自动运行四步；评估步骤内部同时执行规则治理检查。
+`eval_workflows.py` 输出质量报告，统计 workflow 覆盖率、测试用例登记率、数据来源声明率、真实/模拟用例数、标准新鲜度、规则治理和 CI 七步结果。GitHub Actions 在 push 和 pull request 时自动运行七步：结构校验、规则治理、业务断言、标准变动断言、地区适用性断言、工程量公式断言、评估报告。
 
 仓库约定：正文和模板不使用 emoji 图标；状态标记使用 `[警告]`、`[通过]` 等文字。
 

@@ -42,7 +42,7 @@
 | Skill 版本与 CHANGELOG 一致 |  | 通过/需修正 |
 | 标准索引版本与测试场景一致 |  | 通过/需修正 |
 | 地方规则/信息价期别有效 |  | 通过/需修正 |
-| CI 四步通过 | validate/scenarios/standard-change/eval | 通过/需修正 |
+| CI 七步通过 | validate/governance/scenarios/standard-change/applicability/quantity/eval | 通过/需修正 |
 | 旧项目/旧标准标志正确 |  | 通过/需修正 |
 
 ## 四、签认

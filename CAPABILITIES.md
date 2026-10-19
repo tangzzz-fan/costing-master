@@ -39,7 +39,7 @@
 | 文件抽取与证据索引 | 文件清单、证据索引、资料完整性、OCR/版本风险 | `workflows/document-extraction-and-evidence.md`、`templates/evidence-index.md`、`input-specs/document-intake.md` | 已实现 |
 | 地区标准与版本门控 | 江苏/苏州、上海、浙江执行时间、地方资料 | `references/standards-index.md`、`references/region-jiangsu-shanghai-zhejiang.md` | 已实现，待人工审核 |
 | 新旧标准混用检查 | 2013/2024 混用、地方过渡 | `references/standard-transition-check.md`、`test-cases/standard-change.case.md` | 已实现 |
-| 质量评估与回归 | 覆盖率、数据来源、CI 四步、质量报告 | `references/evaluation-and-regression.md`、`scripts/eval_workflows.py`、`templates/quality-report.md` | 已实现 |
+| 质量评估与回归 | 覆盖率、数据来源、CI 七步、质量报告 | `references/evaluation-and-regression.md`、`scripts/eval_workflows.py`、`templates/quality-report.md` | 已实现 |
 | 企业级交付 | 角色分离、交付包、审核记录、审计轨迹、签认边界、归档 | `workflows/enterprise-delivery.md`、`references/enterprise-delivery.md`、`templates/delivery-package.md`、`templates/review-record.md` | 已实现 |
 | Excel 输出 | 多 sheet 工作簿、公式、证据列、判断等级、台账模板 | `references/excel-output-guide.md`、`templates/excel/README.md` | 已实现 |
 | 规则调用治理 | 规则 ID、任务清单、preflight/postflight、规则覆盖率、人工 gate | `rules/README.md`、`templates/task-manifest.md`、`scripts/check_rule_governance.py` | 已实现 |
