@@ -6,6 +6,7 @@
 .idea/
 outputs/
 .superpowers/
+.workbuddy/
 __pycache__/
 *.pyc
 *.xlsx
