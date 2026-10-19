@@ -75,7 +75,8 @@
       "tests": [
         "test-cases/unit-price-analysis.case.md",
         "test-cases/pricing-and-bid-review.case.md",
-        "test-cases/boq-feature-missing.case.md"
+        "test-cases/boq-feature-missing.case.md",
+        "test-cases/metro-quantity-check.case.md"
       ],
       "enforcement": "script+manual",
       "owner": "待人工审核"
@@ -101,7 +102,8 @@
       "tests": [
         "test-cases/duplicate-visa.case.md",
         "test-cases/settlement-audit.case.md",
-        "test-cases/cost-management.case.md"
+        "test-cases/cost-management.case.md",
+        "test-cases/metro-quantity-check.case.md"
       ],
       "enforcement": "checklist+manual",
       "owner": "待人工审核"
@@ -217,7 +219,9 @@
         "test-cases/standard-change.case.md",
         "test-cases/standard-transition.case.md",
         "test-cases/evaluation-and-regression.case.md",
-        "test-cases/suzhou-metro-station.case.md"
+        "test-cases/suzhou-metro-station.case.md",
+        "test-cases/project-applicability.case.md",
+        "test-cases/standards-verification.case.md"
       ],
       "enforcement": "script+manual",
       "owner": "待人工审核"
@@ -237,7 +241,10 @@
         "test-cases/evaluation-and-regression.case.md",
         "test-cases/standard-change.case.md",
         "test-cases/document-extraction-and-evidence.case.md",
-        "test-cases/rule-governance.case.md"
+        "test-cases/rule-governance.case.md",
+        "test-cases/project-applicability.case.md",
+        "test-cases/standards-verification.case.md",
+        "test-cases/metro-quantity-check.case.md"
       ],
       "enforcement": "script+manual",
       "owner": "待人工审核"
@@ -307,7 +314,8 @@
       "templates": [],
       "tests": [
         "test-cases/suzhou-metro-station.case.md",
-        "test-cases/standard-change.case.md"
+        "test-cases/standard-change.case.md",
+        "test-cases/project-applicability.case.md"
       ],
       "enforcement": "checklist+manual",
       "owner": "待人工审核"

@@ -144,6 +144,7 @@ metadata:
 | 全过程造价阶段说明 | `references/13-step-cost-management.md` |
 | 合同类型、风险分配、价款调整 | `references/contract-and-risk.md` |
 | 变更签证、索赔、反索赔 | `references/change-order-and-claims.md` |
+| 谈判准备、争议点应对、话术和案例 | `references/negotiation-strategy.md` |
 | 材料价差调整 | `references/material-price-adjustment.md` |
 | 结算审核、决算、审计 | `references/audit-and-settlement.md` |
 | 费用组成、取费口径、增值税 | `references/fee-composition.md` |
