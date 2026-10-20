@@ -10,7 +10,7 @@ description: |
   组价、算量指标、新旧标准混用、目标成本。
   不用于海外计价规则、国际合同范本、非造价维度法律解释，且不替代签章、评标或法律意见。
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # 造价大师 Costing Master
