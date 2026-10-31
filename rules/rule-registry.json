@@ -1,6 +1,6 @@
 {
-  "version": "1.0.1",
-  "last_reviewed": "2026-10-19",
+  "version": "1.1.0",
+  "last_reviewed": "2026-10-31",
   "rules": [
     {
       "id": "R-001",
@@ -244,7 +244,8 @@
         "test-cases/rule-governance.case.md",
         "test-cases/project-applicability.case.md",
         "test-cases/standards-verification.case.md",
-        "test-cases/metro-quantity-check.case.md"
+        "test-cases/metro-quantity-check.case.md",
+        "test-cases/software-export-review.case.md"
       ],
       "enforcement": "script+manual",
       "owner": "待人工审核"
@@ -341,6 +342,28 @@
       ],
       "tests": [
         "test-cases/excel-output.case.md"
+      ],
+      "enforcement": "script+manual",
+      "owner": "待人工审核"
+    },
+    {
+      "id": "R-015",
+      "title": "软件导出包体检与回填边界",
+      "status": "active",
+      "effective_date": "2026-10-31",
+      "source": "workflows/software-export-review.md、references/software-and-quotas.md、江苏省电子招投标数据交换标准",
+      "workflows": [
+        "workflows/software-export-review.md"
+      ],
+      "references": [
+        "references/software-and-quotas.md",
+        "references/standards-index.md"
+      ],
+      "templates": [
+        "templates/software-issue-return-list.md"
+      ],
+      "tests": [
+        "test-cases/software-export-review.case.md"
       ],
       "enforcement": "script+manual",
       "owner": "待人工审核"

@@ -1,6 +1,8 @@
 # Excel 清单/报价表输入规范
 
 > 地铁/轨道交通清单另见 `input-specs/metro-boq.md`。
+>
+> 计价软件导出包的最小导出集、表头别名、专有文件边界和问题回填见 `input-specs/software-export-package.md`；需要自动体检时运行 `scripts/check_software_export.py`。
 
 ## 支持文件格式
 

@@ -2,15 +2,17 @@
 name: costing-master
 description: |
   面向中国工程造价实务的文件审核与工作流辅助 Skill。用于清单特征/漏项检查、预算编制辅助、
-  结算审核、合同商务风险识别、变更签证审核、材料价差分析、成本测算、投标报价和清标分析。
-  以 GB/T 50500-2024 为基准，结合项目合同、招标文件、图纸、工程量清单、地方计价依据、
-  信息价期别和用户上传资料，输出可复核的表格、台账、审核意见和需补资料清单。
+  结算审核、合同商务风险识别、变更签证审核、材料价差分析、成本测算、投标报价、清标分析和
+  计价软件导出包体检与问题回填。以 GB/T 50500-2024 为基准，结合项目合同、招标文件、图纸、
+  工程量清单、地方计价依据、信息价期别和用户上传资料，输出可复核的表格、台账、审核意见和
+  需补资料清单。
   触发词：工程造价、预算、结算、清单、项目特征、漏项、定额、综合单价、招标控制价、
   最高投标限价、投标报价、不平衡报价、合同风险、变更签证、材料调差、进度款、定额换算、
-  组价、算量指标、新旧标准混用、目标成本。
+  组价、算量指标、新旧标准混用、目标成本、软件导出、GCCP、广联达、新点、清标、
+  电子招投标、24jz、导出包、问题回填。
   不用于海外计价规则、国际合同范本、非造价维度法律解释，且不替代签章、评标或法律意见。
 metadata:
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # 造价大师 Costing Master
@@ -32,6 +34,7 @@ metadata:
 7. **区分工作模式**：未上传地区资料时，只输出参考区间、风险提示和需补资料清单；上传地区资料和项目文件后，可进入预算、报价校核、结算审核、材料调差等项目工作模式。
 8. **交付前二次审核**：复杂任务完成后，必须按 `workflows/second-pass-review.md` 对初稿进行质检，再输出最终成果或修正建议。
 9. **标准与依据可追溯**：标准、法规、计价依据和官方来源统一登记在 `references/standards-index.md`；引用前核对其状态和最近核对日期，项目合同和地方现行文件优先。
+10. **软件导出包先体检再回填**：涉及广联达 GCCP/GBQ、新点、斯维尔、品茗、鲁班等软件导出的清单、报价或结算表，先按 `workflows/software-export-review.md` 体检，再用 `templates/software-issue-return-list.md` 回填；不直接编辑软件专有文件。
 
 ## 规则调用治理
 
@@ -74,12 +77,14 @@ metadata:
 - 预算编制、最高投标限价审核、投标报价分析、不平衡报价识别
 - 合同价款条款风险识别、变更签证审核、索赔费用证据链检查
 - 进度款审核、竣工结算审核、审减/审增台账、算量指标反查、成本测算和偏差分析
+- 计价软件导出包体检、问题回填、电子招投标数据交换前核对
 
 ## 不适用边界
 
 - 不替代完整工程量计算、BIM/算量软件、造价软件数据库或地方定额库。
 - 不在缺少图纸和清单的情况下承诺“完整漏项检查”。
 - 不直接出具法律定性、招投标违法认定、评标结论或审计机关结论。
+- 不读取或修改 `.GBQ`、`.GCCP`、`.24jz`、`.24jk`、`.24jt` 等软件专有文件；只处理导出的 Excel/CSV。
 - 不处理纯海外计价规则、国际合同条件或非中国标准计价项目。
 
 ## 文件输入处理规则
@@ -95,6 +100,7 @@ metadata:
 | 地铁/轨道交通清单、车站和盾构计价表 | `input-specs/metro-boq.md` | 地铁清单特征、工程量、变更和结算 |
 | 混合文件、扫描件、邮件、会议纪要 | `input-specs/document-intake.md` | 文件识别、字段抽取、证据索引、资料完整性 |
 | 材料价格表、信息价、询价单 | `input-specs/material-price-table.md` | 材料调差、价格异常分析 |
+| 计价软件导出包（GCCP/新点/斯维尔等） | `input-specs/software-export-package.md` | 导出包体检、问题回填、专有文件边界 |
 
 ### 通用抽取字段
 
@@ -118,6 +124,7 @@ metadata:
 | 用含量指标反查 GTJ/GCCP 算量合理性 | `workflows/quantity-indicator-check.md` |
 | 目标成本、动态成本、成本偏差、管理层摘要 | `workflows/cost-management.md` |
 | 综合单价组价、预算编制、投标报价分析、清标分析 | `workflows/pricing-and-bid-review.md` |
+| 计价软件导出包体检、问题回填、电子招投标数据交换核对 | `workflows/software-export-review.md` |
 | 地铁/轨道交通车站、盾构、变更索赔和结算审核 | `workflows/metro-rail-transit-audit.md` |
 | 混合文件抽取、证据索引和资料完整性检查 | `workflows/document-extraction-and-evidence.md` |
 | 内部审核、对外交付包、审核记录和归档 | `workflows/enterprise-delivery.md` |
@@ -150,7 +157,7 @@ metadata:
 | 结算审核、决算、审计 | `references/audit-and-settlement.md` |
 | 费用组成、取费口径、增值税 | `references/fee-composition.md` |
 | 目标成本、动态成本、成本偏差 | `references/cost-management.md` |
-| 造价软件和定额体系边界 | `references/software-and-quotas.md` |
+| 造价软件、定额体系、软件导出包和电子招投标数据交换 | `references/software-and-quotas.md` |
 | DWG/CAD 图纸处理策略与能力边界 | `references/dwg-cad-handling.md` |
 | 造价指标、含量指标、参考价格 | `references/zaojia-indicators.md` |
 | 信息价缺失时的市场询价方法 | `references/market-pricing-fallback.md` |
@@ -174,6 +181,7 @@ metadata:
 | 目标成本测算表 | `templates/target-cost-estimate.md` |
 | 投标报价分析表 | `templates/bid-price-analysis-table.md` |
 | 清标澄清问题清单 | `templates/clearance-question-list.md` |
+| 软件问题回填清单 | `templates/software-issue-return-list.md` |
 | 地铁清单特征检查表 | `templates/metro-boq-feature-check-table.md` |
 | 地铁变更索赔证据清单 | `templates/metro-claim-evidence-checklist.md` |
 | 证据索引与资料完整性清单 | `templates/evidence-index.md` |

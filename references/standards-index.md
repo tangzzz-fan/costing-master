@@ -1,6 +1,6 @@
 # 标准、法规与计价依据索引
 
-> 状态：草案 v0.5，待人工审核。
+> 状态：草案 v0.6，待人工审核。
 >
 > 用途：统一登记本 Skill 使用的国家标准、法规、合同示范文本和地方资料入口，减少重复查找，并为版本更新提供检查清单。
 >
@@ -63,6 +63,7 @@
 | 地区 | 现行配套文件 | 施行日期 | 官方来源 | 审核状态 |
 |---|---|---|---|---|
 | 江苏/苏州 | 2026版江苏省建设工程消耗量指标、2026版江苏省建设工程费用参考；苏州建函建〔2026〕72号 | 2026-06-01 | [苏州市住建局通知](https://zfcjj.suzhou.gov.cn/szszjj/tzgg/202604/7560cd682a16499b8547ea3cc10e95aa.shtml) | 待人工审核 |
+| 江苏/苏州 | 《建设工程电子招标投标造价数据交换标准》（2026-06-01 执行，替代 DGJ32/TJ 93-2016） | 2026-06-01 | [江苏省建设工程招标网](http://jszb.com.cn/JSZB/UploadFile/20260414092904254.pdf) | 已核对文本，执行时间待人工审核 |
 | 上海 | 《上海市建设工程工程量清单计价应用规则》（2025版），沪建标定〔2025〕521号 | 2026-01-01 | [上海市住建委通知](https://zjw.sh.gov.cn/jsgl/20251112/c189e11c9fa6440a940a691ebdd7c3c6.html) | 待人工审核 |
 | 浙江 | 《浙江省建设工程计价依据（2025版）》，浙建建发〔2026〕90号；过渡期浙建建函〔2025〕255号 | 2026-11-01 | [浙江省建设厅通知](https://www.zjzj.net/news/newsInfor/10/detailed/37014df096b2ecf30198f4e03bd4016f) | 待人工审核 |
 
@@ -108,6 +109,8 @@
 | `references/standard-transition-check.md` | S01、S02、地方过渡文件 | 新旧标准混用检查 |
 | `references/region-jiangsu-shanghai-zhejiang.md` | S01、S02、江浙沪地方文件、项目合同 | 地区执行时间、优先级和项目适用 |
 | `references/metro-rail-transit.md` | S01、C08、地方轨道交通计价依据、项目合同 | 地铁车站/盾构清单、变更索赔、材料调差和结算 |
+| `references/software-and-quotas.md` | S01、L01、L05 | 造价软件、电子招投标数据交换和软件导出回填 |
+| `workflows/software-export-review.md` | S01、L01、L05 | 软件导出包体检与问题回填工作流 |
 | `workflows/settlement-audit.md` | S01、S04、S05 | 结算审核工作流 |
 | `workflows/boq-missing-items-check.md` | S01、C01-C09 | 清单特征与漏项检查 |
 
@@ -120,6 +123,7 @@
 | C01-C09 工程量计算标准 | `boq-and-pricing`、`excel-boq`、`metro-boq`、清单/地铁 workflow | `boq-feature-missing`、`suzhou-metro-station` | 更新计算规则、清单特征 |
 | L01 江苏/苏州 | `standards-index`、`region-jiangsu-shanghai-zhejiang`、`software-and-quotas`、`fee-composition`、`boq-and-pricing`、`market-pricing-fallback`、`zaojia-indicators`、`metro-rail-transit` | `suzhou-metro-station`、`document-extraction-and-evidence` | 更新地方执行时间、费用和价格来源 |
 | L02 上海 / L03 浙江 | `region-jiangsu-shanghai-zhejiang`、`software-and-quotas`、`fee-composition`、`metro-rail-transit` | `document-extraction-and-evidence` | 更新地方执行时间和计价依据 |
+| L05 江苏电子招投标数据交换 | `software-and-quotas`、`software-export-review`、`software-export-package`、`software-issue-return-list` | `software-export-review` | 更新文件后缀、精度、一致性项和计算规则 |
 | S03 GF-2017-0201 | `contract-and-risk`、合同风险模板 | `contract-risk` | 更新合同风险条款 |
 | S04/S05 质量保证金/结算办法 | `audit-and-settlement`、结算/进度款 workflow | `settlement-audit`、`progress-payment` | 更新时限、质保金和结算口径 |
 
@@ -185,7 +189,8 @@
     {"id": "L01", "region": "江苏/苏州", "name": "2026版江苏省建设工程消耗量指标/费用参考；苏州建函建〔2026〕72号", "status": "current", "effective_date": "2026-06-01", "superseded_date": null, "last_reviewed": "2026-10-18"},
     {"id": "L02", "region": "上海", "name": "上海市建设工程工程量清单计价应用规则（2025版）", "status": "current", "effective_date": "2026-01-01", "superseded_date": null, "last_reviewed": "2026-10-18"},
     {"id": "L03", "region": "浙江", "name": "浙江省建设工程计价依据（2025版）", "status": "upcoming", "effective_date": "2026-11-01", "superseded_date": null, "last_reviewed": "2026-10-18"},
-    {"id": "L04", "region": "浙江", "name": "浙江省建设工程计价依据（2018版，历史版本）", "status": "superseded", "effective_date": null, "superseded_date": "2026-11-01", "last_reviewed": "2026-10-18"}
+    {"id": "L04", "region": "浙江", "name": "浙江省建设工程计价依据（2018版，历史版本）", "status": "superseded", "effective_date": null, "superseded_date": "2026-11-01", "last_reviewed": "2026-10-18"},
+    {"id": "L05", "region": "江苏", "name": "建设工程电子招标投标造价数据交换标准（.24jz/.24jk/.24jt，Version 4.0）", "status": "current", "effective_date": "2026-06-01", "superseded_date": null, "last_reviewed": "2026-10-31"}
   ]
 }
 ```
@@ -199,3 +204,4 @@
 | 2026-10-18 | v0.3 | 增加城市轨道交通专项计价依据索引 | 待人工审核 |
 | 2026-10-18 | v0.4 | 增加标准影响矩阵和机器可读登记，供标准新鲜度检查使用 | 待人工审核 |
 | 2026-10-18 | v0.5 | 增加历史版本 L00/L04，供苏州/浙江标准变动测试使用 | 待人工审核 |
+| 2026-10-31 | v0.6 | 增加 L05 江苏电子招投标造价数据交换标准（.24jz/.24jk/.24jt，2026-06-01 执行） | 已核对文本，执行时间待人工审核 |

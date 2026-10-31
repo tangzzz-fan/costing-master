@@ -43,10 +43,13 @@
 | 企业级交付 | 角色分离、交付包、审核记录、审计轨迹、签认边界、归档 | `workflows/enterprise-delivery.md`、`references/enterprise-delivery.md`、`templates/delivery-package.md`、`templates/review-record.md` | 已实现 |
 | Excel 输出 | 多 sheet 工作簿、公式、证据列、判断等级、台账模板 | `references/excel-output-guide.md`、`templates/excel/README.md` | 已实现 |
 | 规则调用治理 | 规则 ID、任务清单、preflight/postflight、规则覆盖率、人工 gate | `rules/README.md`、`templates/task-manifest.md`、`scripts/check_rule_governance.py` | 已实现 |
+| 软件导出包体检 | 表头/行号识别、编码、五要素、量价、合计、精度、单位、2024 规费、问题回填 | `workflows/software-export-review.md`、`input-specs/software-export-package.md`、`templates/software-issue-return-list.md`、`scripts/check_software_export.py` | 已实现 |
+| 电子招投标数据交换 | 江苏 .24jz/.24jk/.24jt 后缀、精度、一致性校验项、6.0.4 计算规则 | `references/software-and-quotas.md`、`references/standards-index.md` | 已实现，执行时间待人工审核 |
 
 ## 三、不适用与边界
 
 - 不替代算量软件、BIM、GTJ/GQI、GCCP 或地方定额库。
+- 不读取或修改 `.GBQ`、`.GCCP`、`.24jz`、`.24jk`、`.24jt` 等软件专有文件；只处理导出的 Excel/CSV。
 - 不替代注册造价工程师签章、企业审批、评标委员会判断、审计机关结论或法律意见。
 - 不在缺少图纸、合同、清单、地勘、信息价期别等关键资料时给确定金额结论。
 - 不编造定额编号、费率、材料价格、工程量、签证签字或监测数据。
@@ -58,6 +61,7 @@
 - 结算：资料清单 → 证据索引 → 变更/签证 → 材料调差 → 进度款/结算审核 → 管理层摘要。
 - 成本：目标成本 → 合同成本 → 动态成本 → 偏差分析 → 管理层摘要。
 - 地铁：车站/区间清单 → 车站/盾构特征 → 变更/监测 → 材料调差 → 进度款/结算。
+- 软件导出：导出包清单 → 自动体检 → 人工复核 → 问题回填 → 软件修改 → 重新导出复检 → 平台校验。
 - 标准变动：核对公告 → 更新索引/影响矩阵 → 更新测试场景 → 回归 → 人工审核。
 
 ## 五、相关入口

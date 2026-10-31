@@ -285,6 +285,9 @@ def main() -> int:
     quantity_ok, quantity_output = run_step(
         "quantity", ["scripts/test_metro_quantity.py"]
     )
+    software_ok, software_output = run_step(
+        "software-export", ["scripts/test_software_export.py"]
+    )
     rule_ok, rule_output = run_step(
         "rules", ["scripts/check_rule_governance.py"]
     )
@@ -315,6 +318,8 @@ def main() -> int:
         gaps.append("test_project_applicability.py failed")
     if not quantity_ok:
         gaps.append("test_metro_quantity.py failed")
+    if not software_ok:
+        gaps.append("test_software_export.py failed")
     if rule_registry is None:
         gaps.append("rules/rule-registry.json missing or invalid")
     if rule_test_coverage < 100:
@@ -395,6 +400,7 @@ def main() -> int:
             f"| test_standard_change.py | {'PASS' if standard_change_ok else 'FAIL'} | {one_line(standard_change_output)} |",
             f"| test_project_applicability.py | {'PASS' if applicability_ok else 'FAIL'} | {summary_line(applicability_output)} |",
             f"| test_metro_quantity.py | {'PASS' if quantity_ok else 'FAIL'} | {summary_line(quantity_output)} |",
+            f"| test_software_export.py | {'PASS' if software_ok else 'FAIL'} | {summary_line(software_output)} |",
             f"| check_rule_governance.py | {'PASS' if rule_ok else 'FAIL'} | {one_line(rule_output)} |",
             "",
             "## Gaps",

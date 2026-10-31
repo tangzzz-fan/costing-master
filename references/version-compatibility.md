@@ -8,9 +8,9 @@
 
 | 字段 | 取值来源 | 示例 |
 |---|---|---|
-| Skill 版本 | `SKILL.md` 的 `metadata.version` | 0.13.0 |
-| 标准索引版本 | `references/standards-index.md` 状态行 | v0.5 |
-| 地方规则版本 | `references/region-jiangsu-shanghai-zhejiang.md` 的 L 编号 | L01 江苏/苏州 |
+| Skill 版本 | `SKILL.md` 的 `metadata.version` | 1.1.0 |
+| 标准索引版本 | `references/standards-index.md` 状态行 | v0.6 |
+| 地方规则版本 | `references/region-jiangsu-shanghai-zhejiang.md` 的 L 编号 | L01 江苏/苏州；L05 电子招投标数据交换 |
 | CI 状态 | 最近一次质量报告 | 七步通过 |
 
 四元组缺任意一项，交付包只能作为草稿。
@@ -26,6 +26,7 @@
 | 0.13.0 | v0.5 | L00–L04 | 7 | 工程量估算与校核、地区适用性断言、单价样本校验 |
 | 1.0.0 | v0.5，待人工审核 | L00–L04 | 7 | 稳定发布；标准索引审核未完成，缺口见发布说明 |
 | 1.0.1 | v0.5，待人工审核 | L00–L04 | 7 | 场景按合同签订日划断为 GB 50500-2013 + L00；新增真实官方文件演练包 |
+| 1.1.0 | v0.6，待人工审核 | L00–L05 | 7 | 软件导出包体检与问题回填；江苏 .24jz/.24jk/.24jt 数据交换口径；真实公开清单测试 |
 
 > 0.13.0 之前的行按 `CHANGELOG.md` 推定，未逐版本核对标准索引版本；引用历史版本时以对应提交的 `references/standards-index.md` 状态行为准。
 

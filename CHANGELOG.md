@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.1.0 — 2026-10-31
+
+- 新增 `workflows/software-export-review.md`：计价软件导出包体检与问题回填工作流，覆盖广联达 GCCP/GBQ、新点、斯维尔、品茗、鲁班等导出表，明确“导出→体检→回填→复检→平台校验”闭环和专有文件边界
+- 新增 `input-specs/software-export-package.md`：最小导出包、表头别名、软件差异、江苏 `.24jz/.24jk/.24jt` 数据交换口径、文件命名和保密要求
+- 新增 `templates/software-issue-return-list.md`：按单位工程、工作表、软件行号、清单编码和字段回填的问题清单模板
+- 新增 `scripts/check_software_export.py`：读取 CSV/XLSX（含共享字符串、GB18030/GBK），自动识别标题行、表头、清单行、分部行和合计行，检查编码、五要素、量价、合计、精度、单位、2024 规费和不可见字符，输出 UTF-8 BOM 问题回填 CSV 和 Markdown 报告
+- 新增 `scripts/test_software_export.py`：8 项断言，覆盖真实公开清单、问题样例、XLSX、GBK CSV、CLI 退出码、问题回填表头和 `.24jz` 专有文件边界
+- 新增 `test-cases/software-export-review.case.md` 和 `test-cases/fixtures/software-export/`：真实公开清单取自江苏政府采购网《2025 年城市安全建设-市管 12 座桥梁轻量化监测设备安装》汉桥清单（项目编号 JSZC-320300-ZCGL-G2025-0016，PDF 第 1-3 页），问题样例在真实清单基础上改造；`provenance.md` 记录来源 URL、SHA256、抽取和改造说明
+- `references/software-and-quotas.md` 新增江苏《建设工程电子招标投标造价数据交换标准》条款摘要：`.24jz/.24jk/.24jt`、Version 4.0、XSD 校验、精度、百分比存储、6.0.1 一致性校验项和 6.0.4 计算规则
+- `references/standards-index.md` 新增 L05 江苏电子招投标数据交换标准（2026-06-01 执行，替代 DGJ32/TJ 93-2016），执行时间和地方适用性待人工审核
+- `references/region-jiangsu-shanghai-zhejiang.md` 补充江苏电子招投标文件后缀和投标不得改变清单项/暂列金额/暂估价/税率/安全生产费率的提示
+- `rules/rule-registry.json` 新增 R-015“软件导出包体检与回填边界”，规则总数 15 条，workflow/测试用例覆盖率保持 100%
+- `SKILL.md`、`README.md`、`CAPABILITIES.md`、`ROADMAP.md`、`test-cases/README.md` 同步导航、能力、版本和测试矩阵
+- 已知限制：未取得真实软件导出包和 `.24jz/.24jk/.24jt` 样例，XLSX/CSV fixture 为按常见导出格式构造；平台 XSD 校验、清标规则和软件版本差异仍需人工核对；自动体检不替代软件校验、清标工具和专业人员判断
+- bump version 1.1.0
+
 ## v1.0.1 — 2026-10-20
 
 - 修正苏州地铁 VIII-TS-08 场景的标准口径：公开合同公示签署日为 2020-05-18，早于 GB/T 50500-2024 实施日 2025-09-01 和江苏 2026-06-01 划断，场景改为 `GB 50500-2013 + L00`、`legacy_project: true`，并记录 `contract_signed_date` 与 `standard_basis`

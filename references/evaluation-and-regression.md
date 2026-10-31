@@ -46,11 +46,12 @@
 1. 运行 `python3 scripts/validate.py`。
 2. 运行 `python3 scripts/test_scenarios.py`。
 3. 运行 `python3 scripts/test_standard_change.py`。
-4. 运行 `python3 scripts/check_rule_governance.py`，确认规则路径、任务清单和覆盖率。
-5. 运行 `python3 scripts/eval_workflows.py`。
-6. 按受影响的用例做人工语义验收，重点看证据链、结论强度和缺资料降级。
-7. 更新 `CHANGELOG.md`、版本号和 `test-cases/README.md`。
-8. 由人工审核人签认后发布。
+4. 运行 `python3 scripts/test_software_export.py`，确认软件导出包体检的 CSV/XLSX、真实清单、问题样例和退出码断言通过。
+5. 运行 `python3 scripts/check_rule_governance.py`，确认规则路径、任务清单和覆盖率。
+6. 运行 `python3 scripts/eval_workflows.py`。
+7. 按受影响的用例做人工语义验收，重点看证据链、结论强度和缺资料降级。
+8. 更新 `CHANGELOG.md`、版本号和 `test-cases/README.md`。
+9. 由人工审核人签认后发布。
 
 ## 六、质量报告
 
@@ -59,6 +60,7 @@
 - 评估范围、版本、日期、数据来源。
 - workflow 覆盖率、数据来源声明率、真实数据用例数、确定性断言数。
 - 规则总数、active 规则测试覆盖率、workflow 规则覆盖率和测试用例规则覆盖率。
+- 软件导出包体检断言结果（真实公开清单、问题样例、XLSX/CSV、专有文件边界）。
 - CI 七步结果和规则治理检查结果。
 - 失败用例、未覆盖项和缺口。
 - 人工审核点、结论和签认。
