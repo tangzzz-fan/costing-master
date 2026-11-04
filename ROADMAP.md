@@ -42,7 +42,7 @@
 | v1.0.1 | 场景标准划断修正 | 以合同签订日而非当前日期判定适用标准；用真实官方文件搭演练包 | fixture 标准字段、交付包/审核记录/企业交付示例、`examples/drill-suzhou-metro-viii-ts-08/`、CHANGELOG | `legacy_project` 与 `standard_version` 一致；演练包金额闭合；CI 七步通过 | 合同签署日来源与划断口径 |
 | v1.1.0 | 软件导出包体检与问题回填 | 计价软件导出包结构、表头/行号、编码、五要素、量价、合计、精度、单位、2024 规费检查；江苏 .24jz/.24jk/.24jt 数据交换口径；问题回填清单 | `workflows/software-export-review.md`、`input-specs/software-export-package.md`、`templates/software-issue-return-list.md`、`scripts/check_software_export.py`、`scripts/test_software_export.py`、真实公开清单 fixture、CHANGELOG | 真实公开清单 21 项、合计 216,994.84 元体检通过；问题样例覆盖 10 类规则；CSV/XLSX/GBK 和退出码断言通过；专有文件不解析 | 软件版本差异、平台 XSD 和清标规则、回填边界 |
 | v1.1.1 | 评审缺陷修正 | 全角空格漏检、不可回溯条款编号、fixture 差异记录、问题回填模板矛盾；单价样本校验纳入 CI | `scripts/check_software_export.py`、`scripts/test_software_export.py`（10 项断言）、`scripts/eval_workflows.py`、`provenance.md`、问题回填模板、CHANGELOG | 全角空格和精度断言经反向验证；单价测试失败可使 CI 判红；文档示例与工具实跑一致；CI 七步通过 | 条款编号原文、分部小计校验边界 |
-| v1.1.2 | 审核债推进（第一批） | 标准索引核对底稿；C01-C09 日期；江苏、上海、浙江官方原文；轨交专篇证据 | `docs/standards-verification-worksheet.md`、`references/standards-index.md`、`references/region-jiangsu-shanghai-zhejiang.md`、`docs/release-blockers.md`、CHANGELOG | 22 条登记有官方来源和检索日期；核对结果可逐条复核；签认栏留空；校验脚本通过 | 标准文本解释、签认结论、P0-05 书面答复 |
+| v1.1.2 | 审核债推进（第一批） | 标准索引核对底稿；C01-C09 日期；江苏、上海、浙江官方原文；轨交专篇证据 | `docs/standards-verification-worksheet.md`、`references/standards-index.md`、`references/region-jiangsu-shanghai-zhejiang.md`、`docs/release-blockers.md`、CHANGELOG | 22 条登记逐条给出核对状态，已核对项附官方链接和检索日期；未核对项明确标记缺失；签认栏留空；校验脚本通过 | 标准文本解释、签认结论、P0-05 书面答复 |
 
 ### 维护补丁
 
