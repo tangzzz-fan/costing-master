@@ -255,7 +255,7 @@ shasum -a 256 dist/costing-master-vX.Y.Z.tar.gz > dist/costing-master-vX.Y.Z.tar
 
 ## 版本路线
 
-当前版本：v1.1.2（详见 `CHANGELOG.md`）。发布范围和已知缺口见 `RELEASE-v1.0.0.md`，后续版本计划见 `ROADMAP.md`，标准核对底稿见 `docs/standards-verification-worksheet.md`。
+当前版本：v1.2.0（详见 `CHANGELOG.md`）。发布范围和已知缺口见 `RELEASE-v1.0.0.md`，后续版本计划见 `ROADMAP.md`，标准核对底稿见 `docs/standards-verification-worksheet.md`。模块分级和新增门槛见路线图「范围纪律」。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -282,6 +282,7 @@ shasum -a 256 dist/costing-master-vX.Y.Z.tar.gz > dist/costing-master-vX.Y.Z.tar
 | v1.1 | 已发布 | 软件导出包体检与问题回填：真实公开清单测试、XLSX/CSV 体检脚本、江苏 .24jz/.24jk/.24jt 数据交换口径 |
 | v1.1.1 | 已发布 | 评审缺陷修正：全角空格漏检、不可回溯条款编号、provenance 差异记录、问题回填模板矛盾；单价样本校验纳入 CI |
 | v1.1.2 | 已发布 | 审核债推进：标准核对底稿、C01-C09 日期补齐、江苏/上海/浙江官方原文；签认仍待专业人员 |
+| v1.2.0 | 已发布 | 范围收敛与版本对齐：范围纪律、8 核心/6 边缘冻结/4 越界停投、路线图三步化；无新增业务功能 |
 
 ## 免责声明
 
