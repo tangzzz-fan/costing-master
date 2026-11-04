@@ -227,6 +227,21 @@ CI 执行 `validate.yml` 的七个步骤；`eval_workflows.py` 除输出质量�
 
 仓库约定：正文和模板不使用 emoji 图标；状态标记使用 `[警告]`、`[通过]` 等文字。
 
+## 发布打包
+
+```bash
+git archive --format=tar.gz --prefix=costing-master/ \
+  -o dist/costing-master-vX.Y.Z.tar.gz vX.Y.Z
+shasum -a 256 dist/costing-master-vX.Y.Z.tar.gz > dist/costing-master-vX.Y.Z.tar.gz.sha256
+```
+
+两条约束，违反会导致包在对方机器上校验失败或丢文件：
+
+- 包内目录前缀必须是 `costing-master`。`validate.py` 检查 SKILL.md 的 `name` 与所在目录名一致，前缀带版本号会直接报错。
+- 使用 tar.gz，不要用 zip。`git archive` 的 zip 在 macOS 解压时会把中文文件名（例如演练包里的「摘录.md」）写成乱码并可能截断文件。
+
+打包后应解压到隔离目录，运行 `python3 scripts/validate.py` 和 `python3 scripts/eval_workflows.py` 确认通过；`dist/` 已在 `.gitignore` 中排除。
+
 ## 适用依据
 
 - GB/T 50500-2024《建设工程工程量清单计价标准》
