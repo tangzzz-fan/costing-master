@@ -541,7 +541,7 @@ def is_total_name(name: str) -> bool:
 
 
 def has_invisible(value: str) -> bool:
-    return bool(re.search(r"[​‌‍﻿ \t]", value or ""))
+    return bool(re.search(r"[\u200b\u200c\u200d\ufeff\u00a0\t\u3000]", value or ""))
 
 
 def unit_warning(name: str, unit: str) -> str:
@@ -1079,7 +1079,7 @@ def analyze_sheet(
                         "核对软件单价精度和导出小数位后确认",
                         "提示",
                         "人工确认",
-                        "江苏省电子招投标数据交换标准 6.0.4；5.0.1 金额和单价精度",
+                        "江苏省电子招投标数据交换标准 6.0.4 计算规则；精度要求见 references/software-and-quotas.md 8.3",
                         "SW-04",
                     )
                 else:
@@ -1146,7 +1146,7 @@ def analyze_sheet(
                 "按工程量计算标准和软件设置核对精度，避免导出精度失真",
                 "提示",
                 "人工确认",
-                "江苏省电子招投标数据交换标准 5.0.1：清单工程量最多 6 位",
+                "江苏省电子招投标数据交换标准格式与精度要求；见 references/software-and-quotas.md 8.3：清单工程量最多 6 位",
                 "SW-06",
             )
         if decimal_places(total_text) > 2:
@@ -1162,7 +1162,7 @@ def analyze_sheet(
                 "核对软件金额精度和四舍五入设置，按标准保留 2 位",
                 "提示",
                 "人工确认",
-                "江苏省电子招投标数据交换标准 5.0.1：金额最多 2 位",
+                "江苏省电子招投标数据交换标准格式与精度要求；见 references/software-and-quotas.md 8.3：金额最多 2 位",
                 "SW-06",
             )
         if decimal_places(price_text) > 2:
@@ -1178,7 +1178,7 @@ def analyze_sheet(
                 "核对综合单价精度；人材机单价可按 4 位，但综合单价和金额通常保留 2 位",
                 "提示",
                 "人工确认",
-                "江苏省电子招投标数据交换标准 5.0.1：金额最多 2 位",
+                "江苏省电子招投标数据交换标准格式与精度要求；见 references/software-and-quotas.md 8.3：金额最多 2 位",
                 "SW-06",
             )
 
@@ -1236,7 +1236,7 @@ def analyze_sheet(
                     "清理字段中的空格和不可见字符，避免平台一致性校验失败",
                     "警告",
                     "确定问题",
-                    "江苏省电子招投标数据交换标准 6.0.2：去除不可见字符和空格",
+                    "江苏省电子招投标数据交换标准格式与精度要求；见 references/software-and-quotas.md 8.3",
                     "SW-11",
                 )
 

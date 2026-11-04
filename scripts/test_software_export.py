@@ -278,11 +278,48 @@ def test_cli_requires_input() -> None:
     print("[通过] 无输入时返回用法提示")
 
 
+def mutated_copy(folder: str, replacements: list[tuple[str, str]]) -> Path:
+    text = REAL_CSV.read_text(encoding="utf-8-sig")
+    for old, new in replacements:
+        assert text.count(old) == 1, old
+        text = text.replace(old, new)
+    target = Path(folder) / "清单-改造.csv"
+    target.write_text(text, encoding="utf-8-sig")
+    return target
+
+
+def test_full_width_space_is_flagged() -> None:
+    with tempfile.TemporaryDirectory() as folder:
+        target = mutated_copy(folder, [(",靶标,", ",靶\u3000标,")])
+        result = analyze(target)[0]
+        hits = [
+            issue
+            for issue in result.issues
+            if issue.rule_id == "SW-11" and issue.field == "项目名称"
+        ]
+        assert hits, problems(result)
+        assert hits[0].level == "警告", hits[0].level
+    print("[通过] 项目名称含全角空格时命中 SW-11")
+
+
+def test_precision_beyond_two_decimals_is_flagged() -> None:
+    with tempfile.TemporaryDirectory() as folder:
+        target = mutated_copy(folder, [(",6925.87,", ",6925.872,")])
+        result = analyze(target)[0]
+        hits = [issue for issue in result.issues if "金额小数位超过 2 位" in issue.problem]
+        assert hits, problems(result)
+        assert hits[0].level == "提示", hits[0].level
+        assert hits[0].field == "合价", hits[0].field
+    print("[通过] 合价小数位超过 2 位时命中精度检查")
+
+
 def main() -> int:
     tests = [
         test_real_boq_header_and_items,
         test_real_boq_has_no_false_errors,
         test_issue_fixture_flags_expected_rules,
+        test_full_width_space_is_flagged,
+        test_precision_beyond_two_decimals_is_flagged,
         test_xlsx_reader_matches_csv,
         test_gbk_csv_reader,
         test_cli_outputs_and_exit_codes,
