@@ -201,8 +201,11 @@ python3 scripts/test_standard_change.py
 python3 scripts/test_project_applicability.py
 python3 scripts/test_metro_quantity.py
 python3 scripts/test_software_export.py
+python3 scripts/test_unit_price_data.py
 python3 scripts/eval_workflows.py
 ```
+
+CI 执行 `validate.yml` 的七个步骤；`eval_workflows.py` 除输出质量报告外，还统一调度 `test_software_export.py` 和 `test_unit_price_data.py`，任一失败即判定 CI 失败。
 
 `validate.py` 检查 SKILL.md frontmatter、相对路径和链接、README 目录树、workflow 测试用例覆盖、markdown 表格一致性、重复标题、测试用例数据来源、Excel CSV 模板表头/BOM 和 emoji 禁用规则。
 
@@ -237,7 +240,7 @@ python3 scripts/eval_workflows.py
 
 ## 版本路线
 
-当前版本：v1.1.0（详见 `CHANGELOG.md`）。发布范围和已知缺口见 `RELEASE-v1.0.0.md`，后续版本计划见 `ROADMAP.md`。
+当前版本：v1.1.1（详见 `CHANGELOG.md`）。发布范围和已知缺口见 `RELEASE-v1.0.0.md`，后续版本计划见 `ROADMAP.md`。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|
@@ -262,6 +265,7 @@ python3 scripts/eval_workflows.py
 | v1.0 | 已发布 | 稳定发布：12 条工作流、企业交付、版本兼容矩阵；标准索引人工审核待完成，缺口见发布说明 |
 | v1.0.1 | 已发布 | 苏州地铁场景按合同签订日划断改为 GB 50500-2013 + L00；新增真实官方文件演练包 |
 | v1.1 | 已发布 | 软件导出包体检与问题回填：真实公开清单测试、XLSX/CSV 体检脚本、江苏 .24jz/.24jk/.24jt 数据交换口径 |
+| v1.1.1 | 已发布 | 评审缺陷修正：全角空格漏检、不可回溯条款编号、provenance 差异记录、问题回填模板矛盾；单价样本校验纳入 CI |
 
 ## 免责声明
 

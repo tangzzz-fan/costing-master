@@ -12,7 +12,7 @@ description: |
   电子招投标、24jz、导出包、问题回填。
   不用于海外计价规则、国际合同范本、非造价维度法律解释，且不替代签章、评标或法律意见。
 metadata:
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # 造价大师 Costing Master
