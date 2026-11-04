@@ -12,7 +12,7 @@ description: |
   电子招投标、24jz、导出包、问题回填。
   不用于海外计价规则、国际合同范本、非造价维度法律解释，且不替代签章、评标或法律意见。
 metadata:
-  version: "1.1.1"
+  version: "1.1.2"
 ---
 
 # 造价大师 Costing Master
@@ -136,6 +136,7 @@ metadata:
 |---|---|
 | 规则调用治理、任务清单和规则登记 | `rules/README.md` |
 | 标准、法规与计价依据索引（含核对状态） | `references/standards-index.md` |
+| 标准核对底稿与签认栏（AI 不代签） | `docs/standards-verification-worksheet.md` |
 | 江苏/上海/浙江地区资料与执行时间 | `references/region-jiangsu-shanghai-zhejiang.md` |
 | 地铁/轨道交通车站、盾构和变更索赔审核 | `references/metro-rail-transit.md` |
 | 文件抽取、证据索引和资料可靠性 | `references/file-extraction-and-evidence.md` |
