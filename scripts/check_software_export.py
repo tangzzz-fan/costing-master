@@ -3,9 +3,9 @@
 
 用途：
 - 读取广联达 GCCP/GBQ、新点、斯维尔、品茗、鲁班等计价软件导出的
-  Excel/CSV 清单计价表，自动识别表头和清单行。
-- 检查清单编码、五要素、量价合价、合计闭合、单位、精度、2024 版费用
-  口径等常见导出问题。
+  Excel/CSV 清单计价表，自动识别多级合并表头、分部层级、清单行和合计行。
+- 检查清单编码、五要素、量价合价、分部小计树、合计闭合、跨表勾稽、公式完整
+  性、单位、精度、结构化项目特征要素、2024 版费用口径等常见导出问题。
 - 输出可直接回填到软件的问题清单（CSV，UTF-8 BOM）和 Markdown 体检报告。
 
 边界：
@@ -25,72 +25,40 @@ from __future__ import annotations
 
 import argparse
 import csv
-import io
+import json
 import re
 import sys
-import unicodedata
 import zipfile
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
-CANONICAL_HEADERS = [
-    "序号",
-    "项目编码",
-    "项目名称",
-    "项目特征",
-    "计量单位",
-    "工程量",
-    "综合单价",
-    "合价",
-    "暂估价",
-    "定额编号",
-    "备注",
-]
+from boq_parser import (
+    CANONICAL_HEADERS,
+    FIELD_ALIASES,
+    Item,
+    Sheet,
+    clean_text,
+    column_map,
+    decimal_places,
+    detect_header,
+    format_decimal,
+    format_money,
+    is_boq_header,
+    is_subtotal_name,
+    is_total_name,
+    load_sheets,
+    map_header_row,
+    md_cell,
+    normalize_unit,
+    parse_decimal,
+    record_value,
+)
 
-FIELD_ALIASES = {
-    "序号": ["序号", "序", "no", "no."],
-    "项目编码": [
-        "项目编码",
-        "清单编码",
-        "编码",
-        "项目编号",
-        "清单编号",
-        "项目代码",
-        "清单项目编码",
-    ],
-    "项目名称": ["项目名称", "清单名称", "名称", "子目名称", "项目"],
-    "项目特征": [
-        "项目特征",
-        "项目特征描述",
-        "特征描述",
-        "特征",
-        "项目特征及工作内容",
-    ],
-    "计量单位": ["计量单位", "单位", "单位名称"],
-    "工程量": ["工程量", "数量", "清单工程量", "工程数量", "计算工程量"],
-    "综合单价": [
-        "综合单价",
-        "单价",
-        "综合单价元",
-        "单价元",
-        "全费用综合单价",
-    ],
-    "合价": ["合价", "金额", "合价元", "金额元", "总价", "合计金额"],
-    "暂估价": ["暂估价", "其中暂估价", "暂估单价", "暂估价元"],
-    "定额编号": [
-        "定额编号",
-        "定额号",
-        "子目编号",
-        "定额子目编号",
-        "定额项目编号",
-    ],
-    "备注": ["备注", "说明", "备注说明"],
-}
+ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_FEATURE_RULES_PATH = ROOT / "data" / "boq-feature-rules.json"
 
-CORE_FIELDS = ("项目编码", "项目名称", "计量单位", "工程量", "综合单价", "合价")
-TOTAL_WORDS = ("合计", "小计", "总计", "本页小计", "分部分项合计", "单位工程合计")
 ISSUE_HEADERS = [
     "序号",
     "问题编号",
@@ -145,98 +113,6 @@ UNIT_RULES = [
     ),
 ]
 
-UNIT_ALIASES = {
-    "㎡": "m2",
-    "m²": "m2",
-    "平方米": "m2",
-    "m³": "m3",
-    "立方米": "m3",
-    "米": "m",
-    "吨": "t",
-    "千克": "kg",
-    "公斤": "kg",
-    "台班": "台班",
-}
-
-
-def normalize_header(value: object) -> str:
-    """Normalize a header cell for alias matching."""
-    text = unicodedata.normalize("NFKC", str(value or ""))
-    text = re.sub(r"\s+", "", text)
-    text = text.replace("：", "").replace(":", "")
-    text = re.sub(r"[（(][^）)]*[）)]", "", text)
-    return text.lower()
-
-
-ALIAS_TO_FIELD: dict[str, str] = {}
-for _field, _aliases in FIELD_ALIASES.items():
-    for _alias in _aliases:
-        ALIAS_TO_FIELD[normalize_header(_alias)] = _field
-
-
-def normalize_unit(value: str) -> str:
-    text = unicodedata.normalize("NFKC", str(value or "")).strip()
-    text = re.sub(r"\s+", "", text)
-    return UNIT_ALIASES.get(text, text)
-
-
-def clean_text(value: object) -> str:
-    text = str(value or "")
-    text = text.replace("\r", " ").replace("\n", " ").replace("\t", " ")
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def clean_numeric(value: object) -> str:
-    text = unicodedata.normalize("NFKC", str(value or ""))
-    text = text.strip().replace(",", "").replace("，", "").replace(" ", "")
-    text = text.replace("元", "")
-    if text.startswith("(") and text.endswith(")"):
-        text = "-" + text[1:-1]
-    return text
-
-
-def parse_decimal(value: object) -> Decimal | None:
-    text = clean_numeric(value)
-    if text in {"", "-", "—", "－", "/", "／", "--"}:
-        return None
-    try:
-        number = Decimal(text)
-    except InvalidOperation:
-        return None
-    return number
-
-
-def decimal_places(value: object) -> int:
-    text = clean_numeric(value)
-    if "." not in text:
-        return 0
-    fraction = re.sub(r"[^0-9]", "", text.split(".", 1)[1])
-    return len(fraction.rstrip("0"))
-
-
-def format_money(value: Decimal | None) -> str:
-    if value is None:
-        return ""
-    return f"{value.quantize(Decimal('0.01')):,.2f}"
-
-
-def format_decimal(value: Decimal | None) -> str:
-    if value is None:
-        return ""
-    text = format(value.normalize(), "f")
-    return text
-
-
-def md_cell(value: object) -> str:
-    text = clean_text(value).replace("|", "／")
-    return text or " "
-
-
-@dataclass
-class Sheet:
-    name: str
-    rows: list[tuple[int, list[str]]]
-
 
 @dataclass
 class Issue:
@@ -273,20 +149,12 @@ class Issue:
 
 
 @dataclass
-class Item:
+class SectionNode:
     row: int
-    code: str
     name: str
-    feature: str
-    unit: str
-    qty_text: str
-    price_text: str
-    total_text: str
-    provisional_text: str
-    quota_code: str
-    qty: Decimal | None
-    price: Decimal | None
-    total: Decimal | None
+    declared_total: Decimal | None
+    items: list[Item] = field(default_factory=list)
+    child_sections: list["SectionNode"] = field(default_factory=list)
 
 
 @dataclass
@@ -295,6 +163,7 @@ class SheetResult:
     recognized: bool = False
     header_row: int | None = None
     skip_reason: str = ""
+    sheet_role: str = "unknown"
     items: list[Item] = field(default_factory=list)
     sections: int = 0
     totals: int = 0
@@ -304,240 +173,78 @@ class SheetResult:
     issues: list[Issue] = field(default_factory=list)
 
 
-def _col_index(ref: str) -> int:
-    letters = re.sub(r"[^A-Za-z]", "", ref or "").upper()
-    if not letters:
-        return 0
-    index = 0
-    for char in letters:
-        index = index * 26 + (ord(char) - ord("A") + 1)
-    return index - 1
-
-
-def _shared_strings(archive: zipfile.ZipFile) -> list[str]:
-    if "xl/sharedStrings.xml" not in archive.namelist():
+def load_feature_rules(path: Path | None = None) -> list[dict]:
+    target = path or DEFAULT_FEATURE_RULES_PATH
+    if not target.exists():
         return []
-    root = ET.fromstring(archive.read("xl/sharedStrings.xml"))
-    values: list[str] = []
-    for node in root:
-        if not node.tag.endswith("}si"):
-            continue
-        parts = [
-            child.text or ""
-            for child in node.iter()
-            if child.tag.endswith("}t") and child.text
-        ]
-        values.append("".join(parts))
-    return values
-
-
-def _parse_xlsx_sheet(xml: bytes, shared: list[str]) -> list[tuple[int, list[str]]]:
-    root = ET.fromstring(xml)
-    rows: list[tuple[int, list[str]]] = []
-    for row_index, row in enumerate(
-        (node for node in root.iter() if node.tag.endswith("}row")), start=1
-    ):
-        row_number = int(row.get("r") or row_index)
-        cells: list[str] = []
-        for cell in (node for node in row if node.tag.endswith("}c")):
-            reference = cell.get("r") or ""
-            column = _col_index(reference) if reference else len(cells)
-            while len(cells) <= column:
-                cells.append("")
-            cell_type = cell.get("t")
-            value = ""
-            if cell_type == "inlineStr":
-                value = "".join(
-                    node.text or ""
-                    for node in cell.iter()
-                    if node.tag.endswith("}t")
-                )
-            else:
-                raw = None
-                for child in cell:
-                    if child.tag.endswith("}v"):
-                        raw = child.text
-                        break
-                if raw is not None:
-                    if cell_type == "s" and raw.isdigit() and int(raw) < len(shared):
-                        value = shared[int(raw)]
-                    elif cell_type == "b":
-                        value = "TRUE" if raw == "1" else "FALSE"
-                    else:
-                        value = raw
-            cells[column] = value
-        rows.append((row_number, cells))
-    return rows
-
-
-def _resolve_target(target: str) -> str:
-    target = (target or "").lstrip("/")
-    if target.startswith("xl/"):
-        return target
-    if target.startswith("../"):
-        target = target[3:]
-    return "xl/" + target
-
-
-def load_xlsx_sheets(path: Path) -> list[Sheet]:
-    sheets: list[Sheet] = []
-    with zipfile.ZipFile(path) as archive:
-        names = set(archive.namelist())
-        workbook = ET.fromstring(archive.read("xl/workbook.xml"))
-        rel_map: dict[str, str] = {}
-        if "xl/_rels/workbook.xml.rels" in names:
-            rels = ET.fromstring(archive.read("xl/_rels/workbook.xml.rels"))
-            for rel in rels:
-                rel_id = rel.get("Id")
-                target = rel.get("Target")
-                if rel_id and target:
-                    rel_map[rel_id] = _resolve_target(target)
-        shared = _shared_strings(archive)
-        for node in workbook.iter():
-            if not node.tag.endswith("}sheet"):
-                continue
-            name = node.get("name") or "Sheet"
-            rel_id = ""
-            for key, value in node.attrib.items():
-                if key.endswith("}id"):
-                    rel_id = value
-                    break
-            target = rel_map.get(rel_id, "")
-            if target not in names:
-                continue
-            sheets.append(
-                Sheet(name=name, rows=_parse_xlsx_sheet(archive.read(target), shared))
-            )
-    return sheets
-
-
-def _decode_csv(path: Path) -> str:
-    raw = path.read_bytes()
-    for encoding in ("utf-8-sig", "utf-16", "gb18030"):
-        try:
-            return raw.decode(encoding)
-        except UnicodeDecodeError:
-            continue
-    return raw.decode("utf-8", errors="replace")
-
-
-def load_csv_sheets(path: Path) -> list[Sheet]:
-    text = _decode_csv(path)
-    sample = text[:8192]
     try:
-        dialect = csv.Sniffer().sniff(sample, delimiters=",\t;")
-    except csv.Error:
-        dialect = csv.excel
-    rows: list[tuple[int, list[str]]] = []
-    for index, raw_row in enumerate(csv.reader(io.StringIO(text), dialect), start=1):
-        rows.append((index, [str(cell) for cell in raw_row]))
-    return [Sheet(name=path.stem, rows=rows)]
-
-
-def load_sheets(path: Path) -> list[Sheet]:
-    suffix = path.suffix.lower()
-    if suffix == ".csv":
-        return load_csv_sheets(path)
-    if suffix in {".xlsx", ".xlsm"}:
-        return load_xlsx_sheets(path)
-    raise ValueError(f"unsupported file type: {suffix or '(none)'}")
-
-
-def map_header_row(cells: list[str]) -> dict[str, int]:
-    mapping: dict[str, int] = {}
-    for index, cell in enumerate(cells):
-        field = ALIAS_TO_FIELD.get(normalize_header(cell))
-        if field and field not in mapping:
-            mapping[field] = index
-    return mapping
-
-
-def map_two_header_rows(top: list[str], bottom: list[str]) -> dict[str, int]:
-    mapping: dict[str, int] = {}
-    width = max(len(top), len(bottom))
-    for index in range(width):
-        top_field = ALIAS_TO_FIELD.get(
-            normalize_header(top[index] if index < len(top) else "")
+        data = json.loads(target.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    rules = data.get("rules", []) if isinstance(data, dict) else []
+    compiled: list[dict] = []
+    for rule in rules:
+        if not isinstance(rule, dict):
+            continue
+        elements = []
+        for elem in rule.get("required_elements", []):
+            pattern = elem.get("pattern", "")
+            if not pattern:
+                continue
+            try:
+                regex = re.compile(pattern)
+            except re.error:
+                continue
+            elements.append(
+                {
+                    "name": elem.get("name", ""),
+                    "regex": regex,
+                    "hint": elem.get("hint", ""),
+                }
+            )
+        compiled.append(
+            {
+                "id": rule.get("id", ""),
+                "category": rule.get("category", ""),
+                "source": rule.get("source", "references/boq-check-rules.md"),
+                "match_keywords": rule.get("match_keywords", []),
+                "exclude_keywords": rule.get("exclude_keywords", []),
+                "required_elements": elements,
+            }
         )
-        bottom_field = ALIAS_TO_FIELD.get(
-            normalize_header(bottom[index] if index < len(bottom) else "")
-        )
-        if bottom_field and bottom_field not in mapping:
-            mapping[bottom_field] = index
-        elif top_field and top_field not in mapping:
-            mapping[top_field] = index
-    return mapping
+    return compiled
 
 
-def is_boq_header(mapping: dict[str, int]) -> bool:
-    fields = set(mapping)
-    if "项目编码" not in fields or "项目名称" not in fields:
-        return False
-    if "工程量" not in fields:
-        return False
-    if "综合单价" not in fields and "合价" not in fields:
-        return False
-    return len(fields & set(CORE_FIELDS)) >= 4
-
-
-def header_score(mapping: dict[str, int]) -> tuple[int, int]:
-    return len(set(mapping) & set(CORE_FIELDS)), len(mapping)
-
-
-def detect_header(
-    rows: list[tuple[int, list[str]]]
-) -> tuple[dict[str, int], int, int] | None:
-    """Return (field -> column, header row index in rows, data start index)."""
-    best: tuple[tuple[int, int, int, int], int, int, dict[str, int]] | None = None
-    limit = min(30, len(rows))
-    for index in range(limit):
-        mapping = map_header_row(rows[index][1])
-        if is_boq_header(mapping):
-            core, fields = header_score(mapping)
-            span = 1
-            candidate_key = (core, fields, -span, -index)
-            candidate = (candidate_key, index, index + 1, mapping)
-            if best is None or candidate[0] > best[0]:
-                best = candidate
-        if index + 1 < len(rows):
-            combined = map_two_header_rows(rows[index][1], rows[index + 1][1])
-            if is_boq_header(combined):
-                core, fields = header_score(combined)
-                span = 2
-                candidate_key = (core, fields, -span, -index)
-                candidate = (candidate_key, index, index + 2, combined)
-                if best is None or candidate[0] > best[0]:
-                    best = candidate
-    if best is None:
-        return None
-    _, index, data_start, mapping = best
-    return mapping, index, data_start
-
-
-def column_map(mapping: dict[str, int]) -> dict[str, list[int]]:
-    result: dict[str, list[int]] = {}
-    for field, index in mapping.items():
-        result[field] = [index]
-    return result
-
-
-def record_value(
-    cells: list[str], mapping: dict[str, list[int]], field: str
-) -> str:
-    for index in mapping.get(field, []):
-        if index < len(cells) and str(cells[index]).strip():
-            return str(cells[index]).strip()
-    return ""
-
-
-def is_total_name(name: str) -> bool:
-    text = re.sub(r"\s+", "", name or "")
-    return (
-        text in TOTAL_WORDS
-        or text.endswith("合计")
-        or text.endswith("小计")
-        or text == "总计"
-    )
+def check_feature_completeness(
+    name: str, feature: str, feature_rules: list[dict]
+) -> list[tuple[str, str, str]]:
+    """Return list of (category, missing_names_str, source_and_hint) for missing required elements."""
+    if not name or not feature or not feature_rules:
+        return []
+    combined = f"{name} {feature}"
+    findings: list[tuple[str, str, str]] = []
+    for rule in feature_rules:
+        if any(ex in name for ex in rule["exclude_keywords"]):
+            continue
+        if not any(kw in name for kw in rule["match_keywords"]):
+            continue
+        missing_names: list[str] = []
+        hints: list[str] = []
+        for elem in rule["required_elements"]:
+            if not elem["regex"].search(combined):
+                missing_names.append(elem["name"])
+                if elem["hint"]:
+                    hints.append(elem["hint"])
+        if missing_names:
+            findings.append(
+                (
+                    rule["category"],
+                    "、".join(missing_names),
+                    f"{rule['source']}；{'；'.join(hints)}" if hints else rule["source"],
+                )
+            )
+        break
+    return findings
 
 
 def has_invisible(value: str) -> bool:
@@ -652,19 +359,218 @@ def check_standard_row(
         )
 
 
+def classify_sheet_role(name: str, recognized_boq: bool) -> str:
+    clean = re.sub(r"\s+", "", name or "")
+    if "汇总" in clean or "总表" in clean:
+        if "其他项目" in clean:
+            return "other_items"
+        if "措施" in clean:
+            return "measure"
+        return "summary"
+    if "总价措施" in clean or ("措施" in clean and not recognized_boq):
+        return "measure"
+    if "单价措施" in clean and "分部分项" not in clean:
+        return "unit_measure"
+    if "其他项目" in clean:
+        return "other_items"
+    if recognized_boq:
+        return "boq"
+    return "unknown"
+
+
+def _audit_formula_consistency(
+    sheet: Sheet,
+    result: SheetResult,
+    mapping: dict[str, int],
+    total_rows: list[tuple[int, Decimal | None, str]],
+) -> None:
+    if not sheet.is_xlsx:
+        return
+
+    # 1. Flag formula cells missing cached <v> values (unrecalculated XLSX)
+    missing_cache_rows: list[int] = []
+    for item in result.items:
+        if item.total_missing_cache or item.price_missing_cache:
+            missing_cache_rows.append(item.row)
+    if missing_cache_rows:
+        sample_rows = ", ".join(str(r) for r in missing_cache_rows[:5])
+        suffix = f" 等共 {len(missing_cache_rows)} 行" if len(missing_cache_rows) > 5 else ""
+        add_issue(
+            result.issues,
+            sheet.name,
+            missing_cache_rows[0],
+            "",
+            "",
+            "公式缓存",
+            f"第 {sample_rows} 行{suffix}",
+            "存在未计算缓存值的公式单元格，无法获取准确数值",
+            "请先在 Excel 或 WPS 中打开该工作簿并重新保存，使公式缓存值写入后再体检",
+            "警告",
+            "待补资料",
+            "XLSX 公式缓存完整性（SW-12）",
+            "SW-12",
+        )
+
+    # 2. Check hardcoded overrides in 合价 column when >= 70% of items use formulas
+    total_col = mapping.get("合价")
+    if total_col is not None and len(result.items) >= 5:
+        valued_items = [item for item in result.items if item.total is not None]
+        if len(valued_items) >= 5:
+            formula_items = [item for item in valued_items if item.total_has_formula]
+            ratio = len(formula_items) / len(valued_items)
+            if ratio >= 0.70 and len(formula_items) < len(valued_items):
+                for item in valued_items:
+                    if not item.total_has_formula:
+                        add_issue(
+                            result.issues,
+                            sheet.name,
+                            item.row,
+                            item.code,
+                            item.name,
+                            "合价",
+                            item.total_text,
+                            "同列多数清单项使用 Excel 公式，本行合价疑似手工写死静态数值",
+                            "核对本行合价是否被人手工覆盖或调总价，在原软件中确认量价公式一致性",
+                            "警告",
+                            "疑似问题",
+                            f"XLSX 公式一致性审计（本表 {len(formula_items)}/{len(valued_items)} 行含公式，SW-12）",
+                            "SW-12",
+                        )
+
+    # 3. Check hardcoded overrides in subtotal/total rows when >= 70% use formulas
+    if total_col is not None and len(total_rows) >= 3:
+        valued_totals = [(r, v, n) for r, v, n in total_rows if v is not None and "本页" not in n]
+        if len(valued_totals) >= 3:
+            formula_totals = [
+                (r, v, n)
+                for r, v, n in valued_totals
+                if (meta := sheet.cell_meta.get((r, total_col))) is not None and meta.has_formula
+            ]
+            if len(formula_totals) / len(valued_totals) >= 0.70 and len(formula_totals) < len(valued_totals):
+                formula_row_set = {r for r, _, _ in formula_totals}
+                for r, v, n in valued_totals:
+                    if r not in formula_row_set:
+                        add_issue(
+                            result.issues,
+                            sheet.name,
+                            r,
+                            "",
+                            n,
+                            "合计",
+                            format_money(v),
+                            "同表多数小计/合计行使用公式，本合计行疑似手工写死数值",
+                            "核对是否人为修改小计/合计值，确认与明细汇总关系",
+                            "警告",
+                            "疑似问题",
+                            "XLSX 公式一致性审计（SW-12）",
+                            "SW-12",
+                        )
+
+
+def _check_top_sections(
+    result: SheetResult,
+    top_sections: list[SectionNode],
+    tolerance: Decimal,
+) -> None:
+    """Validate section subtotal tree for top-subtotal layouts (e.g. outline BOQ exports)."""
+    if not top_sections:
+        return
+
+    # Link parent sections (no direct items) to subsequent leaf sections until next parent
+    leaf_sections: list[SectionNode] = []
+    parent_sections: list[SectionNode] = []
+    current_parent: SectionNode | None = None
+
+    for sec in top_sections:
+        if sec.items:
+            leaf_sections.append(sec)
+            if current_parent is not None:
+                current_parent.child_sections.append(sec)
+        else:
+            if sec.declared_total is not None:
+                current_parent = sec
+                parent_sections.append(sec)
+
+    # 1. Verify each leaf section with declared total against its direct items
+    for sec in leaf_sections:
+        if sec.declared_total is None:
+            continue
+        items_sum = sum(
+            (item.total for item in sec.items if item.total is not None),
+            Decimal("0"),
+        )
+        diff = sec.declared_total - items_sum
+        if abs(diff) > tolerance:
+            add_issue(
+                result.issues,
+                result.name,
+                sec.row,
+                "",
+                sec.name,
+                "分部小计",
+                format_money(sec.declared_total),
+                "分部小计与分部明细合价汇总不一致",
+                f"分部「{sec.name}」明细合计 {format_money(items_sum)}，"
+                f"分部小计 {format_money(sec.declared_total)}，"
+                f"差额 {format_money(diff)}；核对分部内是否有漏行、隐藏行或四舍五入差异",
+                "错误",
+                "确定问题",
+                "分部小计逐级闭合校验（SW-05）",
+                "SW-05",
+            )
+
+    # 2. Verify parent sections against their child leaf sections
+    for parent in parent_sections:
+        if parent.declared_total is None or not parent.child_sections:
+            continue
+        child_totals = [
+            child.declared_total
+            for child in parent.child_sections
+            if child.declared_total is not None
+        ]
+        if len(child_totals) != len(parent.child_sections):
+            continue
+        children_sum = sum(child_totals, Decimal("0"))
+        diff = parent.declared_total - children_sum
+        if abs(diff) > tolerance:
+            add_issue(
+                result.issues,
+                result.name,
+                parent.row,
+                "",
+                parent.name,
+                "分部合计",
+                format_money(parent.declared_total),
+                "上级分部汇总与下属分部小计之和不一致",
+                f"下属分部小计合计 {format_money(children_sum)}，"
+                f"上级分部汇总 {format_money(parent.declared_total)}，"
+                f"差额 {format_money(diff)}；核对汇总层级和漏计分部",
+                "错误",
+                "确定问题",
+                "分部小计逐级闭合校验（SW-05）",
+                "SW-05",
+            )
+
+
 def analyze_sheet(
-    sheet: Sheet, standard: str, tolerance: Decimal
+    sheet: Sheet,
+    standard: str,
+    tolerance: Decimal,
+    feature_rules: list[dict] | None = None,
 ) -> SheetResult:
     result = SheetResult(name=sheet.name)
     header = detect_header(sheet.rows)
     if header is None:
+        result.sheet_role = classify_sheet_role(sheet.name, recognized_boq=False)
         result.skip_reason = "未识别到清单表头（需要项目编码、项目名称、工程量、单价/合价列）"
         return result
 
     mapping, header_index, data_start = header
     result.recognized = True
+    result.sheet_role = classify_sheet_role(sheet.name, recognized_boq=True)
     result.header_row = sheet.rows[header_index][0]
     fields = column_map(mapping)
+    rules = feature_rules if feature_rules is not None else load_feature_rules()
 
     if "计量单位" not in fields:
         add_issue(
@@ -736,6 +642,15 @@ def analyze_sheet(
     seen_items: dict[tuple[str, str, str], int] = {}
     first_header_mapping = dict(mapping)
 
+    # Section tracking for both top-subtotal and bottom-subtotal layouts
+    top_sections: list[SectionNode] = []
+    current_top_section: SectionNode | None = None
+    bottom_section_items: list[Item] = []
+    bottom_section_name: str = ""
+
+    price_col = mapping.get("综合单价")
+    total_col = mapping.get("合价")
+
     for position in range(data_start, len(sheet.rows)):
         row_number, cells = sheet.rows[position]
         values = {
@@ -789,6 +704,33 @@ def analyze_sheet(
 
         if is_total_name(name):
             total_rows.append((row_number, total, name))
+            if is_subtotal_name(name) and total is not None and bottom_section_items:
+                sec_sum = sum(
+                    (it.total for it in bottom_section_items if it.total is not None),
+                    Decimal("0"),
+                )
+                diff = total - sec_sum
+                if abs(diff) > tolerance:
+                    label = bottom_section_name or name
+                    add_issue(
+                        result.issues,
+                        sheet.name,
+                        row_number,
+                        "",
+                        name,
+                        "分部小计",
+                        format_money(total),
+                        "分部小计与分部明细合价汇总不一致",
+                        f"分部「{label}」明细合计 {format_money(sec_sum)}，"
+                        f"小计行 {format_money(total)}，差额 {format_money(diff)}；"
+                        "核对分部内是否有漏行、隐藏行或手工改价",
+                        "错误",
+                        "确定问题",
+                        "分部小计逐级闭合校验（SW-05）",
+                        "SW-05",
+                    )
+                bottom_section_items = []
+                bottom_section_name = ""
             continue
 
         if not code and quota_code:
@@ -797,6 +739,12 @@ def analyze_sheet(
 
         if not code and name and (price is None or qty is None):
             result.sections += 1
+            sec_node = SectionNode(row=row_number, name=name, declared_total=total)
+            top_sections.append(sec_node)
+            current_top_section = sec_node
+            if total is None:
+                bottom_section_name = name
+                bottom_section_items = []
             continue
 
         if not code and not name:
@@ -819,6 +767,17 @@ def analyze_sheet(
                 "SW-02",
             )
 
+        price_meta = (
+            sheet.cell_meta.get((row_number, price_col))
+            if price_col is not None
+            else None
+        )
+        total_meta = (
+            sheet.cell_meta.get((row_number, total_col))
+            if total_col is not None
+            else None
+        )
+
         item = Item(
             row=row_number,
             code=code,
@@ -833,8 +792,16 @@ def analyze_sheet(
             qty=qty,
             price=price,
             total=total,
+            provisional=provisional,
+            price_has_formula=bool(price_meta and price_meta.has_formula),
+            total_has_formula=bool(total_meta and total_meta.has_formula),
+            price_missing_cache=bool(price_meta and price_meta.missing_cached_value),
+            total_missing_cache=bool(total_meta and total_meta.missing_cached_value),
         )
         result.items.append(item)
+        if current_top_section is not None:
+            current_top_section.items.append(item)
+        bottom_section_items.append(item)
 
         if code:
             normalized_code = code.strip().upper()
@@ -944,6 +911,26 @@ def analyze_sheet(
                 "GB/T 50500-2024 项目特征描述要求",
                 "SW-08",
             )
+        elif "项目特征" in fields and feature:
+            for category, missing_str, basis_hint in check_feature_completeness(
+                name, feature, rules
+            ):
+                add_issue(
+                    result.issues,
+                    sheet.name,
+                    row_number,
+                    code,
+                    name,
+                    "项目特征",
+                    feature,
+                    f"{category}项目特征疑似缺少关键要素：{missing_str}",
+                    f"对照设计图纸与做法表核实并补全：{missing_str}",
+                    "警告",
+                    "疑似问题",
+                    basis_hint,
+                    "SW-08",
+                )
+
         if qty is None:
             add_issue(
                 result.issues,
@@ -1240,6 +1227,12 @@ def analyze_sheet(
                     "SW-11",
                 )
 
+    # Check top-subtotal section tree
+    _check_top_sections(result, top_sections, tolerance)
+
+    # Audit XLSX formula consistency (SW-12)
+    _audit_formula_consistency(sheet, result, mapping, total_rows)
+
     result.totals = len(total_rows)
     result.sum_total = sum(
         (item.total for item in result.items if item.total is not None),
@@ -1250,18 +1243,25 @@ def analyze_sheet(
         for row, value, name in total_rows
         if "本页" not in name and value is not None
     ]
-    if non_page_totals:
-        result.last_total = non_page_totals[-1][1]
-        if len(non_page_totals) <= 2 and result.items:
+    grand_totals = [
+        (row, value, name)
+        for row, value, name in non_page_totals
+        if not is_subtotal_name(name)
+    ]
+    check_totals = grand_totals if grand_totals else non_page_totals
+
+    if check_totals:
+        result.last_total = check_totals[-1][1]
+        if len(check_totals) <= 2 and result.items:
             difference = result.last_total - result.sum_total
             if abs(difference) > tolerance:
-                row_number = non_page_totals[-1][0]
+                row_number = check_totals[-1][0]
                 add_issue(
                     result.issues,
                     sheet.name,
                     row_number,
                     "",
-                    non_page_totals[-1][2],
+                    check_totals[-1][2],
                     "合计",
                     format_money(result.last_total),
                     "合计行与清单项合价汇总不一致",
@@ -1273,11 +1273,11 @@ def analyze_sheet(
                     "江苏省电子招投标数据交换标准 6.0.4：分部分项工程项目费=清单项明细合计",
                     "SW-05",
                 )
-        elif len(non_page_totals) > 2:
+        elif len(check_totals) > 2:
             add_issue(
                 result.issues,
                 sheet.name,
-                non_page_totals[-1][0],
+                check_totals[-1][0],
                 "",
                 "",
                 "合计",
@@ -1309,10 +1309,277 @@ def analyze_sheet(
     return result
 
 
-def build_summary(results: list[SheetResult]) -> str:
+def _extract_fee_table_rows(sheet: Sheet) -> list[tuple[int, str, Decimal | None, str]]:
+    """Extract (row_num, label, amount, raw_line) from summary/measure/other-item tables."""
+    extracted: list[tuple[int, str, Decimal | None, str]] = []
+    amount_col: int | None = None
+    name_col: int | None = None
+
+    for _, cells in sheet.rows[:15]:
+        for idx, cell in enumerate(cells):
+            norm = re.sub(r"\s+", "", cell or "")
+            if any(k in norm for k in ("项目名称", "费用名称", "汇总内容", "费用项目")):
+                name_col = idx
+            if any(k in norm for k in ("金额", "合价", "费金额")):
+                amount_col = idx
+        if name_col is not None and amount_col is not None:
+            break
+
+    for row_num, cells in sheet.rows:
+        if not any(str(c).strip() for c in cells):
+            continue
+        label = ""
+        amount: Decimal | None = None
+        if name_col is not None and name_col < len(cells):
+            label = clean_text(cells[name_col])
+        if amount_col is not None and amount_col < len(cells):
+            amount = parse_decimal(cells[amount_col])
+        if not label:
+            for c in cells:
+                c_clean = clean_text(c)
+                if c_clean and parse_decimal(c_clean) is None:
+                    label = c_clean
+                    break
+        if amount is None:
+            for c in reversed(cells):
+                val = parse_decimal(c)
+                if val is not None:
+                    amount = val
+                    break
+        if label:
+            extracted.append((row_num, label, amount, " ".join(clean_text(c) for c in cells if c)))
+    return extracted
+
+
+def _find_fee_amount(
+    rows: list[tuple[int, str, Decimal | None, str]],
+    keywords: tuple[str, ...],
+    exclude: tuple[str, ...] = (),
+) -> tuple[int, str, Decimal] | None:
+    for row_num, label, amount, _ in rows:
+        compact = re.sub(r"\s+", "", label)
+        if amount is None:
+            continue
+        if any(ex in compact for ex in exclude):
+            continue
+        if any(kw in compact for kw in keywords):
+            return row_num, label, amount
+    return None
+
+
+def _reconcile_workbook(
+    sheets: list[Sheet],
+    results: list[SheetResult],
+    standard: str,
+    tolerance: Decimal,
+) -> list[Issue]:
+    """Cross-sheet reconciliation for multi-sheet export packages (SW-13)."""
+    issues: list[Issue] = []
+    sheet_by_name = {sheet.name: sheet for sheet in sheets}
+    summary_sheets = [
+        sheet_by_name[r.name]
+        for r in results
+        if not r.recognized and r.sheet_role == "summary"
+    ]
+    if not summary_sheets:
+        # Also detect unnamed summary sheets by content
+        for r in results:
+            if r.recognized:
+                continue
+            sheet = sheet_by_name[r.name]
+            fee_rows = _extract_fee_table_rows(sheet)
+            if _find_fee_amount(fee_rows, ("分部分项工程",)) and _find_fee_amount(
+                fee_rows, ("措施项目", "其他项目", "增值税", "工程造价")
+            ):
+                summary_sheets.append(sheet)
+                r.sheet_role = "summary"
+
+    if not summary_sheets:
+        return issues
+
+    # Aggregate detail sheet totals
+    boq_results = [r for r in results if r.recognized and r.sheet_role == "boq"]
+    boq_total = sum(
+        (r.last_total if r.last_total is not None else (r.sum_total or Decimal("0")) for r in boq_results),
+        Decimal("0"),
+    )
+
+    # Measure sheets (recognized unit_measure + fee-table lump measure sheets)
+    measure_totals: list[Decimal] = []
+    for r in results:
+        if r.sheet_role == "unit_measure" and r.recognized:
+            measure_totals.append(r.last_total if r.last_total is not None else (r.sum_total or Decimal("0")))
+        elif r.sheet_role == "measure" and not r.recognized:
+            fee_rows = _extract_fee_table_rows(sheet_by_name[r.name])
+            hit = _find_fee_amount(fee_rows, ("合计", "措施项目费合计", "小计"))
+            if hit:
+                measure_totals.append(hit[2])
+            else:
+                # Sum non-header numeric rows
+                vals = [amt for _, lbl, amt, _ in fee_rows if amt is not None and not any(k in lbl for k in ("表", "汇总", "项目名称"))]
+                if vals:
+                    measure_totals.append(sum(vals, Decimal("0")))
+
+    # Other-items sheets
+    other_totals: list[Decimal] = []
+    tax_inclusive_specialty_provisional: Decimal | None = None
+    for r in results:
+        if r.sheet_role == "other_items":
+            fee_rows = _extract_fee_table_rows(sheet_by_name[r.name])
+            for _, lbl, amt, raw in fee_rows:
+                if amt is not None and "专业工程暂估价" in re.sub(r"\s+", "", lbl):
+                    if "含税" in raw or "含增值税" in raw or standard == "2024":
+                        tax_inclusive_specialty_provisional = amt
+            hit = _find_fee_amount(fee_rows, ("合计", "其他项目费合计"))
+            if hit:
+                other_totals.append(hit[2])
+            else:
+                sub_items = [
+                    _find_fee_amount(fee_rows, ("暂列金额",)),
+                    _find_fee_amount(fee_rows, ("专业工程暂估价",)),
+                    _find_fee_amount(fee_rows, ("计日工",)),
+                    _find_fee_amount(fee_rows, ("总承包服务费",)),
+                ]
+                present = [x[2] for x in sub_items if x is not None]
+                if present:
+                    other_totals.append(sum(present, Decimal("0")))
+
+    for summary_sheet in summary_sheets:
+        fee_rows = _extract_fee_table_rows(summary_sheet)
+        for row_num, lbl, _, _ in fee_rows:
+            check_standard_row(issues, summary_sheet.name, row_num, lbl, standard)
+
+        # 1. Reconcile 分部分项工程费
+        boq_hit = _find_fee_amount(fee_rows, ("分部分项工程",), exclude=("措施",))
+        if boq_hit and boq_results:
+            diff = boq_hit[2] - boq_total
+            if abs(diff) > tolerance:
+                add_issue(
+                    issues,
+                    summary_sheet.name,
+                    boq_hit[0],
+                    "",
+                    boq_hit[1],
+                    "跨表勾稽",
+                    format_money(boq_hit[2]),
+                    "汇总表分部分项工程费与分部分项清单明细合计不一致",
+                    f"汇总表列示 {format_money(boq_hit[2])}，明细表合计 {format_money(boq_total)}，"
+                    f"差额 {format_money(diff)}；核对是否有未导出单位工程或手工修改汇总表",
+                    "错误",
+                    "确定问题",
+                    "导出包跨表勾稽校验（SW-13）",
+                    "SW-13",
+                )
+
+        # 2. Reconcile 措施项目费
+        measure_hit = _find_fee_amount(fee_rows, ("措施项目",), exclude=("安全", "文明"))
+        if measure_hit and measure_totals:
+            m_sum = sum(measure_totals, Decimal("0"))
+            diff = measure_hit[2] - m_sum
+            if abs(diff) > tolerance:
+                add_issue(
+                    issues,
+                    summary_sheet.name,
+                    measure_hit[0],
+                    "",
+                    measure_hit[1],
+                    "跨表勾稽",
+                    format_money(measure_hit[2]),
+                    "汇总表措施项目费与措施明细表合计不一致",
+                    f"汇总表列示 {format_money(measure_hit[2])}，措施表合计 {format_money(m_sum)}，"
+                    f"差额 {format_money(diff)}；核对单价措施与总价措施是否完整导出",
+                    "错误",
+                    "确定问题",
+                    "导出包跨表勾稽校验（SW-13）",
+                    "SW-13",
+                )
+
+        # 3. Reconcile 其他项目费
+        other_hit = _find_fee_amount(fee_rows, ("其他项目",))
+        if other_hit and other_totals:
+            o_sum = sum(other_totals, Decimal("0"))
+            diff = other_hit[2] - o_sum
+            if abs(diff) > tolerance:
+                add_issue(
+                    issues,
+                    summary_sheet.name,
+                    other_hit[0],
+                    "",
+                    other_hit[1],
+                    "跨表勾稽",
+                    format_money(other_hit[2]),
+                    "汇总表其他项目费与其他项目明细表合计不一致",
+                    f"汇总表列示 {format_money(other_hit[2])}，其他项目表合计 {format_money(o_sum)}，"
+                    f"差额 {format_money(diff)}；核对暂列金额、暂估价、计日工、总承包服务费",
+                    "错误",
+                    "确定问题",
+                    "导出包跨表勾稽校验（SW-13）",
+                    "SW-13",
+                )
+
+        # 4. Check 2024 VAT base double-taxation on tax-inclusive 专业工程暂估价
+        vat_hit = _find_fee_amount(fee_rows, ("增值税", "销项税额"))
+        if standard == "2024" and vat_hit and boq_hit and measure_hit and other_hit:
+            if tax_inclusive_specialty_provisional is None:
+                spec_hit = _find_fee_amount(fee_rows, ("专业工程暂估价",))
+                if spec_hit:
+                    tax_inclusive_specialty_provisional = spec_hit[2]
+            if tax_inclusive_specialty_provisional and tax_inclusive_specialty_provisional > 0:
+                gross_base = boq_hit[2] + measure_hit[2] + other_hit[2]
+                net_base = gross_base - tax_inclusive_specialty_provisional
+                for rate in (Decimal("0.09"), Decimal("0.03")):
+                    vat_on_gross = (gross_base * rate).quantize(Decimal("0.01"))
+                    vat_on_net = (net_base * rate).quantize(Decimal("0.01"))
+                    if (
+                        abs(vat_hit[2] - vat_on_gross) <= max(tolerance, Decimal("1.00"))
+                        and abs(vat_hit[2] - vat_on_net) > max(tolerance, Decimal("1.00"))
+                    ):
+                        add_issue(
+                            issues,
+                            summary_sheet.name,
+                            vat_hit[0],
+                            "",
+                            vat_hit[1],
+                            "增值税基数",
+                            format_money(vat_hit[2]),
+                            "疑似对含税专业工程暂估价重复计取增值税",
+                            f"当前增值税 {format_money(vat_hit[2])} 接近按含专业工程暂估价基数 "
+                            f"{format_money(gross_base)} × {int(rate * 100)}% = {format_money(vat_on_gross)} 计算；"
+                            f"若专业工程暂估价 {format_money(tax_inclusive_specialty_provisional)} 为含税价，"
+                            f"扣除后增值税应约 {format_money(vat_on_net)}，请核对含税口径",
+                            "警告",
+                            "疑似问题",
+                            "GB/T 50500-2024 增值税计税基数口径（SW-13）",
+                            "SW-13",
+                        )
+                        break
+
+    return issues
+
+
+def analyze_workbook(
+    sheets: list[Sheet],
+    standard: str,
+    tolerance: Decimal,
+    feature_rules: list[dict] | None = None,
+) -> tuple[list[SheetResult], list[Issue]]:
+    rules = feature_rules if feature_rules is not None else load_feature_rules()
+    results = [
+        analyze_sheet(sheet, standard, tolerance, feature_rules=rules)
+        for sheet in sheets
+    ]
+    package_issues = _reconcile_workbook(sheets, results, standard, tolerance)
+    return results, package_issues
+
+
+def build_summary(
+    results: list[SheetResult], package_issues: list[Issue] | None = None
+) -> str:
     recognized = [result for result in results if result.recognized]
     skipped = [result for result in results if not result.recognized]
-    issues = [issue for result in results for issue in result.issues]
+    issues = [issue for result in results for issue in result.issues] + list(
+        package_issues or []
+    )
     errors = sum(1 for issue in issues if issue.level == "错误")
     warnings = sum(1 for issue in issues if issue.level == "警告")
     tips = sum(1 for issue in issues if issue.level == "提示")
@@ -1375,8 +1642,15 @@ def build_summary(results: list[SheetResult]) -> str:
     return "\n".join(lines)
 
 
-def write_issue_csv(results: list[SheetResult], path: Path, max_issues: int) -> int:
-    issues = [issue for result in results for issue in result.issues]
+def write_issue_csv(
+    results: list[SheetResult],
+    path: Path,
+    max_issues: int,
+    package_issues: list[Issue] | None = None,
+) -> int:
+    issues = [issue for result in results for issue in result.issues] + list(
+        package_issues or []
+    )
     issues = issues[:max_issues]
     with path.open("w", encoding="utf-8-sig", newline="") as handle:
         writer = csv.writer(handle)
@@ -1415,9 +1689,13 @@ def main() -> int:
     parser.add_argument("--md", help="Markdown 体检报告输出路径")
     parser.add_argument("--sheet", help="只处理指定工作表")
     parser.add_argument(
+        "--feature-rules",
+        help="自定义项目特征必填规则 JSON 路径（默认 data/boq-feature-rules.json）",
+    )
+    parser.add_argument(
         "--tolerance",
         default="0.02",
-        help="量价乘积和合计的容差，默认 0.02 元",
+        help="量价乘积、分部小计和合计的容差，默认 0.02 元",
     )
     parser.add_argument(
         "--max-issues",
@@ -1478,26 +1756,34 @@ def main() -> int:
         print(f"--max-issues 必须大于 0：{args.max_issues}")
         return 2
 
-    results = [
-        analyze_sheet(sheet, args.standard, tolerance) for sheet in sheets
-    ]
+    feature_rules = (
+        load_feature_rules(Path(args.feature_rules))
+        if args.feature_rules
+        else load_feature_rules()
+    )
+
+    results, package_issues = analyze_workbook(
+        sheets, args.standard, tolerance, feature_rules=feature_rules
+    )
     if not any(result.recognized for result in results):
         print("未识别到清单计价表。请确认导出的是分部分项清单计价表，或使用 --template 查看表头要求。")
         for result in results:
             print(f"- {result.name}: {result.skip_reason}")
         return 1
 
-    summary = build_summary(results)
+    summary = build_summary(results, package_issues)
     print(summary)
 
     if args.out:
-        written = write_issue_csv(results, Path(args.out), args.max_issues)
+        written = write_issue_csv(
+            results, Path(args.out), args.max_issues, package_issues=package_issues
+        )
         print(f"\n问题回填 CSV：{args.out}（{written} 条）")
     if args.md:
         Path(args.md).write_text(summary + "\n", encoding="utf-8")
         print(f"Markdown 报告：{args.md}")
 
-    issues = [issue for result in results for issue in result.issues]
+    issues = [issue for result in results for issue in result.issues] + package_issues
     return 1 if any(issue.level == "错误" for issue in issues) else 0
 
 

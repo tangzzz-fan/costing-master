@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """
-单价样本校验与参考区间计算工具
+[DEPRECATED / 越界停投] 单价样本校验与参考区间计算工具
+
+范围声明（v1.2.0 起生效）：
+按 ROADMAP.md「范围纪律」，单价库与信息价收集属于信息价平台和定额库领地，
+本脚本已列为越界模块停止投入，不纳入核心 CI 阻断；实际项目应要求项目方
+提供所在地信息价，仅保留本工具作历史兼容。
 
 输入：UTF-8 CSV（可用 Excel 另存），必需列见 REQUIRED_COLUMNS
 输出：按地区和清单项分组的样本数、最小值、最大值、中位数、平均值、参考区间、异常提示
@@ -165,7 +170,9 @@ def build_report(rows: list[dict[str, str]], errors: list[str], warnings: list[s
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="校验单价样本并计算参考区间")
+    parser = argparse.ArgumentParser(
+        description="[DEPRECATED / 越界停投] 校验单价样本并计算参考区间（按 ROADMAP.md v1.2.0 范围纪律不再建单价库，实际项目请使用所在地信息价）"
+    )
     parser.add_argument("csv", nargs="?", help="样本 CSV 路径")
     parser.add_argument(
         "--template",

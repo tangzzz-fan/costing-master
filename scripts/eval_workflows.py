@@ -77,12 +77,11 @@ def version() -> str:
 
 
 def load_registry() -> dict | None:
-    text = read(ROOT / "references" / "standards-index.md")
-    match = re.search(r"```json\n(.*?)\n```", text, re.DOTALL)
-    if not match:
+    path = ROOT / "data" / "standards-registry.json"
+    if not path.exists():
         return None
     try:
-        return json.loads(match.group(1))
+        return json.loads(read(path))
     except json.JSONDecodeError:
         return None
 
@@ -192,6 +191,11 @@ def standard_freshness(registry: dict | None) -> tuple[dict[str, str], list[str]
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", help="optional Markdown report path")
+    parser.add_argument(
+        "--include-legacy",
+        action="store_true",
+        help="also run deprecated/out-of-scope legacy checks (non-blocking)",
+    )
     args = parser.parse_args()
 
     matrix = read(ROOT / "test-cases" / "README.md")
@@ -282,18 +286,24 @@ def main() -> int:
     applicability_ok, applicability_output = run_step(
         "applicability", ["scripts/test_project_applicability.py"]
     )
-    quantity_ok, quantity_output = run_step(
-        "quantity", ["scripts/test_metro_quantity.py"]
-    )
     software_ok, software_output = run_step(
         "software-export", ["scripts/test_software_export.py"]
     )
-    unit_price_ok, unit_price_output = run_step(
-        "unit-price", ["scripts/test_unit_price_data.py"]
+    compare_ok, compare_output = run_step(
+        "compare-boq", ["scripts/test_compare_boq.py"]
     )
     rule_ok, rule_output = run_step(
         "rules", ["scripts/check_rule_governance.py"]
     )
+
+    legacy_results: list[tuple[str, bool, str]] = []
+    if args.include_legacy:
+        qty_ok, qty_output = run_step("quantity", ["scripts/test_metro_quantity.py"])
+        price_ok, price_output = run_step(
+            "unit-price", ["scripts/test_unit_price_data.py"]
+        )
+        legacy_results.append(("test_metro_quantity.py", qty_ok, summary_line(qty_output)))
+        legacy_results.append(("test_unit_price_data.py", price_ok, summary_line(price_output)))
 
     gaps: list[str] = []
     freshness, freshness_gaps = standard_freshness(load_registry())
@@ -319,12 +329,10 @@ def main() -> int:
         gaps.append("test_standard_change.py failed")
     if not applicability_ok:
         gaps.append("test_project_applicability.py failed")
-    if not quantity_ok:
-        gaps.append("test_metro_quantity.py failed")
     if not software_ok:
         gaps.append("test_software_export.py failed")
-    if not unit_price_ok:
-        gaps.append("test_unit_price_data.py failed")
+    if not compare_ok:
+        gaps.append("test_compare_boq.py failed")
     if rule_registry is None:
         gaps.append("rules/rule-registry.json missing or invalid")
     if rule_test_coverage < 100:
@@ -396,7 +404,7 @@ def main() -> int:
             f"| Stale | {freshness['stale']} |",
             f"| Legacy project | {freshness['legacy_project']} |",
             "",
-            "## CI Checks",
+            "## Core Checks",
             "",
             "| Step | Result | Detail |",
             "|---|---|---|",
@@ -404,11 +412,26 @@ def main() -> int:
             f"| test_scenarios.py | {'PASS' if scenario_ok else 'FAIL'} | {one_line(scenario_output)} |",
             f"| test_standard_change.py | {'PASS' if standard_change_ok else 'FAIL'} | {one_line(standard_change_output)} |",
             f"| test_project_applicability.py | {'PASS' if applicability_ok else 'FAIL'} | {summary_line(applicability_output)} |",
-            f"| test_metro_quantity.py | {'PASS' if quantity_ok else 'FAIL'} | {summary_line(quantity_output)} |",
             f"| test_software_export.py | {'PASS' if software_ok else 'FAIL'} | {summary_line(software_output)} |",
-            f"| test_unit_price_data.py | {'PASS' if unit_price_ok else 'FAIL'} | {summary_line(unit_price_output)} |",
+            f"| test_compare_boq.py | {'PASS' if compare_ok else 'FAIL'} | {summary_line(compare_output)} |",
             f"| check_rule_governance.py | {'PASS' if rule_ok else 'FAIL'} | {one_line(rule_output)} |",
             "",
+        ]
+    )
+    if legacy_results:
+        report_lines.extend(
+            [
+                "## Legacy Checks (Deprecated / Non-Blocking)",
+                "",
+                "| Step | Result | Detail |",
+                "|---|---|---|",
+            ]
+        )
+        for name, ok, detail in legacy_results:
+            report_lines.append(f"| {name} | {'PASS' if ok else 'FAIL'} | {detail} |")
+        report_lines.append("")
+    report_lines.extend(
+        [
             "## Gaps",
             "",
         ]

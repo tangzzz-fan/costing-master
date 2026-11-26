@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Validate skill structure and markdown
+      - name: Validate skill structure, markdown and standards registry
         run: python3 scripts/validate.py
       - name: Check rule registry governance
         run: python3 scripts/check_rule_governance.py
@@ -30,7 +30,22 @@ jobs:
         run: python3 scripts/test_standard_change.py
       - name: Run project applicability assertions
         run: python3 scripts/test_project_applicability.py
-      - name: Run metro quantity formula assertions
-        run: python3 scripts/test_metro_quantity.py
-      - name: Evaluate coverage and regression status
+      - name: Run software export review assertions
+        run: python3 scripts/test_software_export.py
+      - name: Run BOQ diff and comparison assertions
+        run: python3 scripts/test_compare_boq.py
+      - name: Evaluate core coverage and regression status
         run: python3 scripts/eval_workflows.py
+
+  legacy-checks:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deprecated metro quantity formula assertions (non-blocking)
+        run: python3 scripts/test_metro_quantity.py
+      - name: Run deprecated unit price sample assertions (non-blocking)
+        run: python3 scripts/test_unit_price_data.py

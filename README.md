@@ -199,13 +199,12 @@ python3 scripts/check_rule_governance.py
 python3 scripts/test_scenarios.py
 python3 scripts/test_standard_change.py
 python3 scripts/test_project_applicability.py
-python3 scripts/test_metro_quantity.py
 python3 scripts/test_software_export.py
-python3 scripts/test_unit_price_data.py
+python3 scripts/test_compare_boq.py
 python3 scripts/eval_workflows.py
 ```
 
-CI 执行 `validate.yml` 的七个步骤；`eval_workflows.py` 除输出质量报告外，还统一调度 `test_software_export.py` 和 `test_unit_price_data.py`，任一失败即判定 CI 失败。
+CI 主 job 执行上述核心步骤；`eval_workflows.py` 统一汇总核心检查（传 `--include-legacy` 时附加运行已停投的 `test_metro_quantity.py` 和 `test_unit_price_data.py`），CI 的 `legacy-checks` job 单独以非阻断方式运行停投模块测试。
 
 `validate.py` 检查 SKILL.md frontmatter、相对路径和链接、README 目录树、workflow 测试用例覆盖、markdown 表格一致性、重复标题、测试用例数据来源、Excel CSV 模板表头/BOM 和 emoji 禁用规则。
 
@@ -255,7 +254,7 @@ shasum -a 256 dist/costing-master-vX.Y.Z.tar.gz > dist/costing-master-vX.Y.Z.tar
 
 ## 版本路线
 
-当前版本：v1.2.0（详见 `CHANGELOG.md`）。发布范围和已知缺口见 `RELEASE-v1.0.0.md`，后续版本计划见 `ROADMAP.md`，标准核对底稿见 `docs/standards-verification-worksheet.md`。模块分级和新增门槛见路线图「范围纪律」。
+当前版本：v1.2.1（详见 `CHANGELOG.md`）。发布范围和已知缺口见 `RELEASE-v1.0.0.md`，后续版本计划见 `ROADMAP.md`，标准核对底稿见 `docs/standards-verification-worksheet.md`。模块分级和新增门槛见路线图「范围纪律」。
 
 | 版本 | 状态 | 目标 |
 |---|---|---|

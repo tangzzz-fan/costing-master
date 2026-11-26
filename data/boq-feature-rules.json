@@ -1,0 +1,240 @@
+{
+  "schema_version": "1.0",
+  "source": "references/boq-check-rules.md 第二节（常见项目特征必查字段）",
+  "rules": [
+    {
+      "id": "FR-01",
+      "category": "土石方工程",
+      "source": "references/boq-check-rules.md 二、土方",
+      "match_keywords": ["挖一般土方", "挖沟槽土方", "挖基坑土方", "挖石方", "回填方", "余方弃置"],
+      "exclude_keywords": ["支护", "降水"],
+      "required_elements": [
+        {
+          "name": "土质类别/回填材料或运距",
+          "pattern": "土|石|砂|碎石|素土|灰土|运距|弃土|外运|km|公里|米|m|深度|压实",
+          "hint": "补充土壤类别/回填料、挖填深度或弃土运距"
+        }
+      ]
+    },
+    {
+      "id": "FR-02",
+      "category": "现浇混凝土",
+      "source": "references/boq-check-rules.md 二、混凝土",
+      "match_keywords": ["混凝土", "砼", "矩形柱", "矩形梁", "有梁板", "无梁板", "剪力墙", "满堂基础", "独立基础", "桩承台"],
+      "exclude_keywords": ["模板", "钢筋", "养护", "凿除", "拆除", "管片", "搅拌站"],
+      "required_elements": [
+        {
+          "name": "混凝土强度等级（如C30）",
+          "pattern": "[Cc]\\s*\\d{2}",
+          "hint": "补充混凝土强度等级（如 C25/C30/C35）及抗渗等级（如有）"
+        }
+      ]
+    },
+    {
+      "id": "FR-03",
+      "category": "钢筋工程",
+      "source": "references/boq-check-rules.md 二、钢筋",
+      "match_keywords": ["现浇构件钢筋", "预制构件钢筋", "砌体钢筋", "预应力钢筋", "钢筋网片"],
+      "exclude_keywords": ["植筋", "套筒", "焊接", "机械连接", "铁件"],
+      "required_elements": [
+        {
+          "name": "钢筋种类/牌号或规格",
+          "pattern": "HPB|HRB|CRB|三级|二级|一级|带肋|光圆|Φ|φ|直径|以内|以外|mm",
+          "hint": "补充钢筋牌号（如 HRB400E）、规格范围及连接方式"
+        }
+      ]
+    },
+    {
+      "id": "FR-04",
+      "category": "砌体工程",
+      "source": "references/boq-check-rules.md 二、砌体",
+      "match_keywords": ["砌块墙", "实心砖墙", "多孔砖墙", "空心砖墙", "加气混凝土砌块", "砖砌体"],
+      "exclude_keywords": ["拆除", "抹灰", "钢筋"],
+      "required_elements": [
+        {
+          "name": "墙厚或砌块规格",
+          "pattern": "\\d+\\s*mm|厚|\\d+×\\d+|\\d+\\*\\d+|200|100|120|240",
+          "hint": "补充墙体厚度或砌块规格"
+        },
+        {
+          "name": "砂浆种类/强度等级",
+          "pattern": "[Mm]\\s*\\d+(?:\\.\\d+)?|砂浆|粘结剂|专用胶",
+          "hint": "补充砌筑砂浆强度等级（如 M5/M7.5/Mb5）"
+        }
+      ]
+    },
+    {
+      "id": "FR-05",
+      "category": "防水工程",
+      "source": "references/boq-check-rules.md 二、防水",
+      "match_keywords": ["防水卷材", "涂膜防水", "屋面防水", "地下室防水", "楼地面防水", "墙面防水"],
+      "exclude_keywords": ["保护层", "找平层", "拆除"],
+      "required_elements": [
+        {
+          "name": "防水材料类型",
+          "pattern": "SBS|APP|TPO|PVC|HDPE|聚氨酯|JS|聚合物|卷材|涂料|涂膜|丙纶|自粘|非固化",
+          "hint": "补充防水材料品种及性能要求"
+        },
+        {
+          "name": "厚度或涂刷道数",
+          "pattern": "\\d+(?:\\.\\d+)?\\s*mm|厚|道|遍|层",
+          "hint": "补充防水层厚度（如 3mm/4mm/1.5mm）或涂刷遍数"
+        }
+      ]
+    },
+    {
+      "id": "FR-06",
+      "category": "门窗工程",
+      "source": "references/boq-check-rules.md 二、门窗",
+      "match_keywords": ["防火门", "铝合金窗", "铝合金门", "塑钢窗", "木门", "卷帘门", "防盗门", "断桥铝窗"],
+      "exclude_keywords": ["门锁", "合页", "闭门器", "拆除", "窗台板"],
+      "required_elements": [
+        {
+          "name": "洞口尺寸或规格型号",
+          "pattern": "\\d+\\s*[×*xX]\\s*\\d+|洞口|规格|型号|甲级|乙级|丙级|系列|\\d+型",
+          "hint": "补充洞口尺寸、系列型号或耐火/玻璃配置"
+        }
+      ]
+    },
+    {
+      "id": "FR-07",
+      "category": "抹灰与装饰面层",
+      "source": "references/boq-check-rules.md 二、装饰面层",
+      "match_keywords": ["墙面一般抹灰", "天棚抹灰", "块料楼地面", "块料墙面", "石材楼地面", "天棚吊顶", "墙面喷刷涂料"],
+      "exclude_keywords": ["铲除", "拆除", "基层清理"],
+      "required_elements": [
+        {
+          "name": "面层材料/做法或厚度规格",
+          "pattern": "mm|厚|遍|道|砂浆|石膏|瓷砖|地砖|花岗岩|大理石|乳胶漆|石膏板|铝扣板|龙骨|\\d+[×*]\\d+",
+          "hint": "补充面层材质、规格、厚度或涂刷遍数及基层做法"
+        }
+      ]
+    },
+    {
+      "id": "FR-08",
+      "category": "模板与脚手架",
+      "source": "references/boq-check-rules.md 二、模板/脚手架",
+      "match_keywords": ["混凝土模板", "满堂脚手架", "综合脚手架", "外脚手架", "里脚手架", "高支模"],
+      "exclude_keywords": ["拆除"],
+      "required_elements": [
+        {
+          "name": "模板材质/部位或搭设高度",
+          "pattern": "木模|钢模|铝模|胶合板|钢管|盘扣|碗扣|高|层高|m|柱|梁|板|墙|基础",
+          "hint": "补充模板类型/构件部位或脚手架搭设形式与高度"
+        }
+      ]
+    },
+    {
+      "id": "FR-09",
+      "category": "电力电缆与电线",
+      "source": "references/boq-check-rules.md 二、电缆电线",
+      "match_keywords": ["电力电缆", "控制电缆", "矿物绝缘电缆", "防火电缆", "配线"],
+      "exclude_keywords": ["电缆头", "保护管", "沟", "井", "桥架"],
+      "required_elements": [
+        {
+          "name": "线缆型号与截面规格",
+          "pattern": "(?:YJV|VV|KVV|RVV|BV|BVR|WDZ|NH|ZR|BTLY|YTTW|BYJ)|(?:\\d+\\s*[×*xX]\\s*\\d+(?:\\.\\d+)?)",
+          "hint": "补充电缆型号（如 ZC-YJV）及芯数截面（如 4×50+1×25）"
+        }
+      ]
+    },
+    {
+      "id": "FR-10",
+      "category": "配电箱与控制柜",
+      "source": "references/boq-check-rules.md 二、消防/电气设备",
+      "match_keywords": ["配电箱", "配电柜", "控制箱", "控制柜", "成套开关柜"],
+      "exclude_keywords": ["接线盒", "基础槽钢"],
+      "required_elements": [
+        {
+          "name": "型号/回路规格或安装方式",
+          "pattern": "型号|规格|\\d+[×*]\\d+|明装|暗装|落地|挂墙|嵌墙|回路|kW|A|系统图",
+          "hint": "补充箱柜型号、尺寸/容量或安装方式"
+        }
+      ]
+    },
+    {
+      "id": "FR-11",
+      "category": "给排水及消防管道",
+      "source": "references/boq-check-rules.md 二、给排水管/消防管道",
+      "match_keywords": ["镀锌钢管", "焊接钢管", "无缝钢管", "PPR管", "PE管", "PVC排水管", "球墨铸铁管", "不锈钢管", "消防管道"],
+      "exclude_keywords": ["套管", "支架", "阀门", "水表", "保温"],
+      "required_elements": [
+        {
+          "name": "管径规格（DN/De/mm）",
+          "pattern": "(?:DN|De|DE|dn|de|Φ|φ|Dg)\\s*\\d+|\\d+\\s*mm",
+          "hint": "补充管道公称直径或外径（如 DN100 / De110）"
+        }
+      ]
+    },
+    {
+      "id": "FR-12",
+      "category": "通风空调风管",
+      "source": "references/boq-check-rules.md 二、风管",
+      "match_keywords": ["镀锌薄钢板风管", "碳钢通风管道", "不锈钢通风管道", "复合风管", "矩形风管", "圆形风管"],
+      "exclude_keywords": ["风口", "风阀", "风机", "支架"],
+      "required_elements": [
+        {
+          "name": "风管材质或板材厚度",
+          "pattern": "镀锌|钢板|不锈钢|酚醛|玻镁|复合|\\d+(?:\\.\\d+)?\\s*mm|δ|厚",
+          "hint": "补充风管材质、钢板厚度及连接/保温要求"
+        }
+      ]
+    },
+    {
+      "id": "FR-13",
+      "category": "电缆桥架",
+      "source": "references/boq-check-rules.md 二、电缆电线/桥架",
+      "match_keywords": ["桥架"],
+      "exclude_keywords": ["支架", "接地", "跨接"],
+      "required_elements": [
+        {
+          "name": "桥架规格尺寸",
+          "pattern": "\\d+\\s*(?:mm)?\\s*[×*xX]\\s*\\d+",
+          "hint": "补充桥架宽×高规格（如 200×100mm）及材质/厚度"
+        }
+      ]
+    },
+    {
+      "id": "FR-14",
+      "category": "市政道路结构层",
+      "source": "references/boq-check-rules.md 二、市政道路",
+      "match_keywords": ["沥青混凝土", "水泥稳定碎石", "级配碎石基层", "水泥混凝土路面", "透层", "粘层"],
+      "exclude_keywords": ["铣刨", "拆除", "井盖"],
+      "required_elements": [
+        {
+          "name": "结构层厚度或配合比/级配",
+          "pattern": "\\d+(?:\\.\\d+)?\\s*(?:cm|mm)|厚|AC-|SMA|ATB|C\\d{2}|\\d+%",
+          "hint": "补充结构层厚度及级配/水泥剂量（如 4cm AC-13C / 5%水稳）"
+        }
+      ]
+    },
+    {
+      "id": "FR-15",
+      "category": "桩基与围护结构",
+      "source": "references/boq-check-rules.md 二、市政桥梁/围护",
+      "match_keywords": ["钻孔灌注桩", "地下连续墙", "地连墙", "预制钢筋混凝土管桩", "SMW工法桩", "三轴搅拌桩"],
+      "exclude_keywords": ["桩头凿除", "声测管", "钢筋笼", "检测"],
+      "required_elements": [
+        {
+          "name": "桩径/墙厚或桩长/深度",
+          "pattern": "桩径|直径|Φ|φ|墙厚|厚|深|桩长|\\d+\\s*mm|\\d+\\s*m|C\\d{2}",
+          "hint": "补充桩径/墙厚、有效桩长/入岩深度及混凝土强度等级"
+        }
+      ]
+    },
+    {
+      "id": "FR-16",
+      "category": "阀门与管件",
+      "source": "references/boq-check-rules.md 二、给排水/消防",
+      "match_keywords": ["闸阀", "蝶阀", "截止阀", "止回阀", "减压阀", "球阀", "安全阀", "电动阀"],
+      "exclude_keywords": ["阀门井", "保温"],
+      "required_elements": [
+        {
+          "name": "公称口径（DN/mm）",
+          "pattern": "(?:DN|De|dn|de|Φ|φ)\\s*\\d+|\\d+\\s*mm",
+          "hint": "补充阀门公称口径（如 DN100）、连接方式及公称压力"
+        }
+      ]
+    }
+  ]
+}

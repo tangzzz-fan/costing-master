@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SCENARIO_PATH = (
     ROOT / "test-cases" / "fixtures" / "standard-change" / "scenario.json"
 )
-REGISTRY_PATH = ROOT / "references" / "standards-index.md"
+REGISTRY_PATH = ROOT / "data" / "standards-registry.json"
 FAILURES: list[str] = []
 
 
@@ -22,10 +22,9 @@ def read(path: Path) -> str:
 
 
 def load_registry() -> dict:
-    match = re.search(r"```json\n(.*?)\n```", read(REGISTRY_PATH), re.DOTALL)
-    if not match:
-        raise ValueError("standards-index.md machine-readable registry missing")
-    return json.loads(match.group(1))
+    if not REGISTRY_PATH.exists():
+        raise ValueError("data/standards-registry.json missing")
+    return json.loads(read(REGISTRY_PATH))
 
 
 def parse_date(value: str) -> date:

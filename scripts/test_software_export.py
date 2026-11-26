@@ -28,6 +28,7 @@ from xml.sax.saxutils import escape
 from check_software_export import (
     ISSUE_HEADERS,
     analyze_sheet,
+    analyze_workbook,
     load_sheets,
 )
 
@@ -313,6 +314,342 @@ def test_precision_beyond_two_decimals_is_flagged() -> None:
     print("[通过] 合价小数位超过 2 位时命中精度检查")
 
 
+def build_custom_xlsx(
+    target: Path,
+    sheets_spec: list[tuple[str, list[list[object]], list[str]]],
+) -> None:
+    """Build multi-sheet xlsx supporting formulas and mergeCells.
+
+    Each cell in rows can be:
+    - str / int / float: static value
+    - tuple ("formula", formula_str, cached_val_or_None): formula cell
+    """
+    shared: list[str] = []
+    positions: dict[str, int] = {}
+
+    def shared_index(value: str) -> int:
+        if value not in positions:
+            positions[value] = len(shared)
+            shared.append(value)
+        return positions[value]
+
+    sheet_entries = []
+    rel_entries = []
+    ct_entries = []
+    sheet_xmls: list[tuple[str, str]] = []
+
+    for idx, (sheet_name, rows, merges) in enumerate(sheets_spec, start=1):
+        sheet_rows = []
+        for row_index, row in enumerate(rows, start=1):
+            cells = []
+            for column_index, cell in enumerate(row, start=1):
+                if cell == "" or cell is None:
+                    continue
+                ref = f"{column_name(column_index)}{row_index}"
+                if isinstance(cell, tuple) and cell[0] == "formula":
+                    _, formula_str, cached = cell
+                    if cached is None:
+                        cells.append(f'<c r="{ref}"><f>{escape(formula_str)}</f></c>')
+                    else:
+                        cells.append(
+                            f'<c r="{ref}"><f>{escape(formula_str)}</f><v>{escape(str(cached))}</v></c>'
+                        )
+                else:
+                    text = str(cell)
+                    try:
+                        float(text.replace(",", ""))
+                    except ValueError:
+                        cells.append(
+                            f'<c r="{ref}" t="s"><v>{shared_index(text)}</v></c>'
+                        )
+                    else:
+                        cells.append(f'<c r="{ref}"><v>{escape(text)}</v></c>')
+            sheet_rows.append(f'<row r="{row_index}">' + "".join(cells) + "</row>")
+
+        merge_xml = ""
+        if merges:
+            merge_xml = (
+                f'<mergeCells count="{len(merges)}">'
+                + "".join(f'<mergeCell ref="{m}"/>' for m in merges)
+                + "</mergeCells>"
+            )
+
+        xml = (
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+            "<sheetData>" + "".join(sheet_rows) + "</sheetData>" + merge_xml + "</worksheet>"
+        )
+        sheet_xmls.append((f"xl/worksheets/sheet{idx}.xml", xml))
+        sheet_entries.append(
+            f'<sheet name="{escape(sheet_name)}" sheetId="{idx}" r:id="rId{idx}"/>'
+        )
+        rel_entries.append(
+            f'<Relationship Id="rId{idx}" '
+            'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" '
+            f'Target="worksheets/sheet{idx}.xml"/>'
+        )
+        ct_entries.append(
+            f'<Override PartName="/xl/worksheets/sheet{idx}.xml" '
+            'ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+        )
+
+    ss_rel_id = len(sheets_spec) + 1
+    rel_entries.append(
+        f'<Relationship Id="rId{ss_rel_id}" '
+        'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" '
+        'Target="sharedStrings.xml"/>'
+    )
+    shared_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        f'<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
+        f'count="{len(shared)}" uniqueCount="{len(shared)}">'
+        + "".join(f"<si><t>{escape(item)}</t></si>" for item in shared)
+        + "</sst>"
+    )
+    workbook_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
+        'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+        "<sheets>" + "".join(sheet_entries) + "</sheets></workbook>"
+    )
+    workbook_rels = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        + "".join(rel_entries)
+        + "</Relationships>"
+    )
+    content_types = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+        '<Default Extension="rels" '
+        'ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+        '<Default Extension="xml" ContentType="application/xml"/>'
+        '<Override PartName="/xl/workbook.xml" '
+        'ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+        + "".join(ct_entries)
+        + '<Override PartName="/xl/sharedStrings.xml" '
+        'ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>'
+        "</Types>"
+    )
+    root_rels = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        '<Relationship Id="rId1" '
+        'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" '
+        'Target="xl/workbook.xml"/>'
+        "</Relationships>"
+    )
+    with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("[Content_Types].xml", content_types)
+        archive.writestr("_rels/.rels", root_rels)
+        archive.writestr("xl/workbook.xml", workbook_xml)
+        archive.writestr("xl/_rels/workbook.xml.rels", workbook_rels)
+        archive.writestr("xl/sharedStrings.xml", shared_xml)
+        for member, content in sheet_xmls:
+            archive.writestr(member, content)
+
+
+def test_xlsx_merged_multi_row_header() -> None:
+    with tempfile.TemporaryDirectory() as folder:
+        target = Path(folder) / "merged-header.xlsx"
+        rows = [
+            ["分部分项工程清单与计价表", "", "", "", "", "", "", ""],
+            ["序号", "项目编码", "项目名称", "项目特征描述", "计量单位", "工程量", "金额（元）", ""],
+            ["", "", "", "", "", "", "综合单价", "合价"],
+            ["1", "010502001001", "矩形柱", "C30现浇商品混凝土，泵送", "m3", "10", "500.00", "5000.00"],
+            ["", "", "合计", "", "", "", "", "5000.00"],
+        ]
+        merges = ["A1:H1", "A2:A3", "B2:B3", "C2:C3", "D2:D3", "E2:E3", "F2:F3", "G2:H2"]
+        build_custom_xlsx(target, [("分部分项", rows, merges)])
+        result = analyze(target)[0]
+        assert result.recognized, result.skip_reason
+        assert len(result.items) == 1, len(result.items)
+        assert result.items[0].price == Decimal("500.00")
+        assert result.items[0].total == Decimal("5000.00")
+        assert levels(result, "错误") == 0, problems(result)
+    print("[通过] XLSX 两行横向/纵向合并表头准确识别")
+
+
+def test_xlsx_formula_hardcode_and_missing_cache() -> None:
+    with tempfile.TemporaryDirectory() as folder:
+        # 1. 9 formulas + 1 hardcoded override -> exactly 1 SW-12 hit
+        target = Path(folder) / "formula-override.xlsx"
+        rows: list[list[object]] = [
+            ["序号", "项目编码", "项目名称", "项目特征", "计量单位", "工程量", "综合单价", "合价"],
+        ]
+        for i in range(1, 11):
+            r = i + 1
+            total_cell: object = (
+                "1000.00" if i == 6 else ("formula", f"F{r}*G{r}", "1000.00")
+            )
+            rows.append([
+                str(i), f"0105020010{i:02d}", f"构件{i}", "C30混凝土", "m3", "10", "100.00", total_cell
+            ])
+        rows.append(["", "", "合计", "", "", "", "", ("formula", "SUM(H2:H11)", "10000.00")])
+        build_custom_xlsx(target, [("分部分项", rows, [])])
+        res = analyze(target)[0]
+        sw12 = [issue for issue in res.issues if issue.rule_id == "SW-12"]
+        assert len(sw12) == 1, sw12
+        assert sw12[0].row == 7 and sw12[0].judgment == "疑似问题", sw12[0]
+
+        # 2. Pure value XLSX (0 formulas) -> 0 SW-12 false alarms
+        pure_target = Path(folder) / "pure-value.xlsx"
+        pure_rows = [
+            ["序号", "项目编码", "项目名称", "项目特征", "计量单位", "工程量", "综合单价", "合价"],
+            *[
+                [str(i), f"0105020010{i:02d}", f"构件{i}", "C30混凝土", "m3", "10", "100.00", "1000.00"]
+                for i in range(1, 11)
+            ],
+            ["", "", "合计", "", "", "", "", "10000.00"],
+        ]
+        build_custom_xlsx(pure_target, [("分部分项", pure_rows, [])])
+        pure_res = analyze(pure_target)[0]
+        assert not [issue for issue in pure_res.issues if issue.rule_id == "SW-12"]
+
+        # 3. Formula missing cached <v> -> graceful SW-12 待补资料
+        nocache_target = Path(folder) / "no-cache.xlsx"
+        nocache_rows: list[list[object]] = [
+            ["序号", "项目编码", "项目名称", "项目特征", "计量单位", "工程量", "综合单价", "合价"],
+            ["1", "010502001001", "矩形柱", "C30混凝土", "m3", "10", "500.00", ("formula", "F2*G2", None)],
+            ["", "", "合计", "", "", "", "", ("formula", "SUM(H2:H2)", None)],
+        ]
+        build_custom_xlsx(nocache_target, [("分部分项", nocache_rows, [])])
+        nocache_res = analyze(nocache_target)[0]
+        assert any(
+            issue.rule_id == "SW-12" and "缓存" in issue.problem
+            for issue in nocache_res.issues
+        ), problems(nocache_res)
+    print("[通过] XLSX 公式审计（SW-12）：抓手工覆盖、纯值不误报、缺缓存优雅提示")
+
+
+def test_section_subtotal_tree_both_layouts() -> None:
+    # 1. Top-subtotal layout (hanqiao-real-boq.csv) at tight tolerance 0.005 catches 0.01 diff
+    sheets = load_sheets(REAL_CSV)
+    tight = analyze_sheet(sheets[0], "2024", Decimal("0.005"))
+    sec_hits = [
+        issue for issue in tight.issues
+        if issue.rule_id == "SW-05" and issue.field == "分部小计"
+    ]
+    assert len(sec_hits) == 1, sec_hits
+    assert "系统软件费用" in sec_hits[0].name and sec_hits[0].row == 23, sec_hits[0]
+
+    # 2. Bottom-subtotal layout with 3 sections; section 2 tampered by +100.00
+    with tempfile.TemporaryDirectory() as folder:
+        csv_path = Path(folder) / "bottom-subtotals.csv"
+        csv_path.write_text(
+            "序号,项目编码,项目名称,项目特征,计量单位,工程量,综合单价,合价\n"
+            ",,一、土石方工程,,,,,\n"
+            "1,010101001001,挖一般土方,三类土、深2m、外运5km,m3,100,20.00,2000.00\n"
+            ",,分部小计,,,,,2000.00\n"
+            ",,二、混凝土工程,,,,,\n"
+            "2,010502001001,矩形柱,C30商品混凝土,m3,10,500.00,5000.00\n"
+            ",,分部小计,,,,,5100.00\n"
+            ",,三、砌筑工程,,,,,\n"
+            "3,010401001001,实心砖墙,240mm厚、M7.5水泥砂浆,m3,10,300.00,3000.00\n"
+            ",,分部小计,,,,,3000.00\n"
+            ",,分部分项合计,,,,,10000.00\n",
+            encoding="utf-8-sig",
+        )
+        cli = run_cli(str(csv_path), "--standard", "2024")
+        assert cli.returncode == 1, cli.stdout
+        res = analyze(csv_path)[0]
+        bad_sec = [
+            issue for issue in res.issues
+            if issue.rule_id == "SW-05" and issue.field == "分部小计"
+        ]
+        assert len(bad_sec) == 1 and bad_sec[0].row == 7, bad_sec
+    print("[通过] 分部小计树校验（SW-05）：覆盖顶部小计与底部小计两种布局")
+
+
+def test_multi_sheet_reconciliation_and_vat_base() -> None:
+    with tempfile.TemporaryDirectory() as folder:
+        boq_rows: list[list[object]] = [
+            ["序号", "项目编码", "项目名称", "项目特征", "计量单位", "工程量", "综合单价", "合价"],
+            ["1", "010502001001", "矩形柱", "C30商品混凝土", "m3", "100", "500.00", "50000.00"],
+            ["", "", "分部分项合计", "", "", "", "", "50000.00"],
+        ]
+        measure_rows: list[list[object]] = [
+            ["序号", "项目名称", "金额"],
+            ["1", "安全生产措施费", "3000.00"],
+            ["2", "文明施工费", "2000.00"],
+            ["", "合计", "5000.00"],
+        ]
+        other_rows: list[list[object]] = [
+            ["序号", "项目名称", "金额", "备注"],
+            ["1", "暂列金额", "5000.00", ""],
+            ["2", "专业工程暂估价", "10000.00", "含税"],
+            ["", "合计", "15000.00", ""],
+        ]
+
+        # 1. Clean balanced 4-sheet workbook (VAT excludes 10000 tax-inclusive provisional: 60000 * 9% = 5400)
+        clean_summary: list[list[object]] = [
+            ["序号", "汇总内容", "金额(元)"],
+            ["1", "分部分项工程费", "50000.00"],
+            ["2", "措施项目费", "5000.00"],
+            ["3", "其他项目费", "15000.00"],
+            ["4", "增值税", "5400.00"],
+            ["5", "工程造价", "75400.00"],
+        ]
+        clean_xlsx = Path(folder) / "clean-pack.xlsx"
+        build_custom_xlsx(
+            clean_xlsx,
+            [
+                ("单位工程汇总表", clean_summary, []),
+                ("分部分项", boq_rows, []),
+                ("总价措施", measure_rows, []),
+                ("其他项目", other_rows, []),
+            ],
+        )
+        results, pkg_issues = analyze_workbook(load_sheets(clean_xlsx), "2024", Decimal("0.02"))
+        assert not [i for i in pkg_issues if i.rule_id == "SW-13"], pkg_issues
+
+        # 2. Tampered summary (boq mismatch + double-taxed VAT 70000 * 9% = 6300)
+        bad_summary: list[list[object]] = [
+            ["序号", "汇总内容", "金额(元)"],
+            ["1", "分部分项工程费", "52000.00"],
+            ["2", "措施项目费", "5000.00"],
+            ["3", "其他项目费", "15000.00"],
+            ["4", "增值税", "6480.00"],
+            ["5", "工程造价", "78480.00"],
+        ]
+        bad_xlsx = Path(folder) / "bad-pack.xlsx"
+        build_custom_xlsx(
+            bad_xlsx,
+            [
+                ("单位工程汇总表", bad_summary, []),
+                ("分部分项", boq_rows, []),
+                ("总价措施", measure_rows, []),
+                ("其他项目", other_rows, []),
+            ],
+        )
+        _, bad_pkg = analyze_workbook(load_sheets(bad_xlsx), "2024", Decimal("0.02"))
+        assert any("分部分项工程费" in i.problem and i.level == "错误" for i in bad_pkg), bad_pkg
+        assert any("专业工程暂估价重复计取增值税" in i.problem for i in bad_pkg), bad_pkg
+    print("[通过] 多表导出包跨表勾稽与 2024 增值税基数校验（SW-13）")
+
+
+def test_structured_feature_rules_positive_and_negative() -> None:
+    with tempfile.TemporaryDirectory() as folder:
+        csv_path = Path(folder) / "feature-rules.csv"
+        csv_path.write_text(
+            "序号,项目编码,项目名称,项目特征,计量单位,工程量,综合单价,合价\n"
+            "1,010502001001,矩形柱,现浇商品混凝土，泵送,m3,10,500.00,5000.00\n"
+            "2,010502001002,矩形柱,C30现浇商品混凝土，泵送,m3,10,500.00,5000.00\n"
+            "3,010902001001,屋面防水卷材,热熔满粘施工,m2,100,60.00,6000.00\n"
+            "4,010902001002,屋面防水卷材,4mm厚SBS改性沥青防水卷材，热熔满粘,m2,100,60.00,6000.00\n"
+            "5,030801001001,镀锌钢管,螺纹连接，室内明装,m,50,40.00,2000.00\n"
+            "6,030801001002,镀锌钢管,DN50，螺纹连接，室内明装,m,50,40.00,2000.00\n"
+            ",,合计,,,,,26000.00\n",
+            encoding="utf-8-sig",
+        )
+        res = analyze(csv_path)[0]
+        sw08_rows = sorted(
+            issue.row for issue in res.issues if issue.rule_id == "SW-08"
+        )
+        assert sw08_rows == [2, 4, 6], sw08_rows
+    print("[通过] 结构化项目特征必填词典（SW-08）：3 组正反向断言精准命中且无误报")
+
+
 def main() -> int:
     tests = [
         test_real_boq_header_and_items,
@@ -325,6 +662,11 @@ def main() -> int:
         test_cli_outputs_and_exit_codes,
         test_cli_rejects_proprietary_files,
         test_cli_requires_input,
+        test_xlsx_merged_multi_row_header,
+        test_xlsx_formula_hardcode_and_missing_cache,
+        test_section_subtotal_tree_both_layouts,
+        test_multi_sheet_reconciliation_and_vat_base,
+        test_structured_feature_rules_positive_and_negative,
     ]
     for test in tests:
         test()

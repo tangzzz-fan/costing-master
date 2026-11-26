@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.2.1 — 2026-11-26
+
+Phase 0 收口与单一事实源治理（`CM-001`–`CM-004`）：
+
+- 历史过程文档归档（`CM-001`）：将根目录 8 份阶段性总结、审核过程记录和早期单价收集指南迁移至 `docs/archive/`，新增 `docs/archive/README.md` 标明以 v1.2.0 `ROADMAP.md` 范围纪律为准；根目录仅保留入口与发布级文档
+- 标准索引分层收口（`CM-002`）：`references/standards-index.md` 明确划分 Tier-1 核心必签（`core`，共 9 条：S01–S05、L01–L03、L05）与 Tier-2 参考资料（`reference`，S06、C01–C09、L00/L04、轨交专篇）；同步精简 `docs/standards-verification-worksheet.md` 签认栏与 `docs/release-blockers.md` P0-01 关闭标准
+- 单一事实源（`CM-003`）：新增 `data/standards-registry.json` 统一登记标准、计算标准和地方规则；重构 `scripts/eval_workflows.py`、`scripts/test_standard_change.py`、`scripts/test_project_applicability.py` 统一消费该文件并消除脚本内硬编码日期；`scripts/validate.py` 新增 Schema 与 Markdown 表格一致性校验
+- 越界模块 CI 解耦（`CM-004`）：在 `scripts/metro_quantity_estimator.py` 与 `scripts/check_unit_price_data.py` 标注 `[DEPRECATED / 越界停投]`；`.github/workflows/validate.yml` 拆分为核心阻断 job 与非阻断 `legacy-checks` job；`scripts/eval_workflows.py` 默认仅执行核心检查（`--include-legacy` 可选运行停投测试）
+- 软件导出体检引擎深化（`CM-005`–`CM-007`）：抽取公共解析模块 `scripts/boq_parser.py`，新增 XLSX 合并单元格还原与 `<f>`/`<v>` 公式完整性审计（`SW-12`，抓手工改价与缺缓存公式）；升级分部小计树逐级校验（支持顶部/底部小计，关闭 `P1-09`）与多表跨表勾稽及 2024 增值税基数校验（`SW-13`）；新增 16 类高频清单结构化项目特征必填规则库 `data/boq-feature-rules.json`（深化 `SW-08`）；`scripts/test_software_export.py` 扩展至 15 项断言
+- 新增清单双版本对比引擎 `scripts/compare_boq.py`（`CM-008`）：支持 `tender-bid`（招标 vs 投标篡改检测）、`revision`（改前 vs 改后问题关闭率统计）、`contract-settlement`（合同 vs 结算超/减量 ±15% 提示、改价/新增/漏减分流与差额闭合），配套 `scripts/test_compare_boq.py`（9 项断言）并纳入核心 CI
+- bump version 1.2.1
+
 ## v1.2.0 — 2026-11-05
 
 本版不新增业务功能，主题是范围收敛与版本对齐。代码与 v1.1.2 相同，新增内容全部是规划、纪律和发布约定。

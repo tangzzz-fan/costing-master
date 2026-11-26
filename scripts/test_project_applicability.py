@@ -9,57 +9,37 @@
 关联规则：R-009（标准和地方规则新鲜度）、R-013（地区优先级与跨地区隔离）
 """
 
+import json
 from datetime import datetime
-from typing import Dict, Tuple
+from pathlib import Path
+from typing import Dict, Optional
+
+ROOT = Path(__file__).resolve().parent.parent
+REGISTRY_PATH = ROOT / "data" / "standards-registry.json"
 
 
-# 地区执行时间配置（基于真实公开文件）
-REGIONAL_CONFIG = {
-    "江苏/苏州": {
-        "national_standard_date": datetime(2025, 9, 1),  # GB/T 50500-2024
-        "local_rule_date": datetime(2026, 6, 1),  # 苏州建函建〔2026〕72号
-        "old_local_rule": "L00",  # 江苏省2014版
-        "new_local_rule": "L01",  # 2026版江苏省消耗量指标
-        "transition_rule": "2026-06-01前已发布招标公告或已签订合同的项目，按原规定执行"
-    },
-    "江苏/南京": {
-        "national_standard_date": datetime(2025, 9, 1),
-        "local_rule_date": datetime(2026, 6, 1),
-        "old_local_rule": "L00",
-        "new_local_rule": "L01",
-        "transition_rule": "同苏州"
-    },
-    "上海": {
-        "national_standard_date": datetime(2025, 9, 1),
-        "local_rule_date": datetime(2026, 1, 1),  # 沪建标定〔2025〕521号
-        "old_local_rule": "旧规则",  # 沪建管〔2014〕872号
-        "new_local_rule": "L02",  # 2025版应用规则
-        "transition_rule": "2026-01-01前已发布招标公告或已签订合同的项目，按原规则执行"
-    },
-    "浙江/杭州": {
-        "national_standard_date": datetime(2025, 9, 1),
-        "local_rule_date": datetime(2026, 11, 1),  # 浙建建发〔2026〕90号
-        "old_local_rule": "L04",  # 2018版
-        "new_local_rule": "L03",  # 2025版
-        "transition_rule": "按招标公告发布日或合同签订日判断；2018版执行至2026-10-31"
-    },
-    "浙江/宁波": {
-        "national_standard_date": datetime(2025, 9, 1),
-        "local_rule_date": datetime(2026, 11, 1),
-        "old_local_rule": "L04",
-        "new_local_rule": "L03",
-        "transition_rule": "同杭州"
-    }
-}
+def load_standards_registry() -> dict:
+    """从单一事实源 data/standards-registry.json 加载标准与地方规则配置。"""
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+
+
+def _find_regional_rule(registry: dict, region: str) -> Optional[dict]:
+    for item in registry.get("local_rules", []):
+        if item.get("status") != "current" or item.get("is_exchange_standard"):
+            continue
+        if item.get("region") == region or region in item.get("aliases", []):
+            return item
+    return None
 
 
 def determine_applicable_standard(
     region: str,
     date: str,
-    date_type: str
+    date_type: str,
+    registry: Optional[dict] = None,
 ) -> Dict[str, str]:
     """
-    判断项目适用的国家标准和地方规则
+    判断项目适用的国家标准和地方规则（直接消费 data/standards-registry.json）。
 
     参数：
         region: 地区（江苏/苏州、江苏/南京、上海、浙江/杭州、浙江/宁波）
@@ -74,7 +54,9 @@ def determine_applicable_standard(
             "level": "确定"
         }
     """
-    if region not in REGIONAL_CONFIG:
+    data = registry if registry is not None else load_standards_registry()
+    rule = _find_regional_rule(data, region)
+    if rule is None:
         return {
             "standard": "未知",
             "local_rule": "未知",
@@ -82,28 +64,27 @@ def determine_applicable_standard(
             "level": "错误"
         }
 
-    config = REGIONAL_CONFIG[region]
+    standards_by_id = {s.get("id"): s for s in data.get("standards", [])}
+    current_nat = standards_by_id.get("S01", {})
+    legacy_nat = standards_by_id.get("S02", {})
+    national_date = datetime.strptime(current_nat["effective_date"], "%Y-%m-%d")
+    local_date = datetime.strptime(rule["effective_date"], "%Y-%m-%d")
     project_date = datetime.strptime(date, "%Y-%m-%d")
+    transition_rule = rule.get("transition_rule", "")
 
     # 判断地方规则（先判断地方，再确定国家标准）
-    if project_date < config["local_rule_date"]:
-        # 地方配套尚未执行，按原规定
-        local_rule = config["old_local_rule"]
-
-        # 浙江特殊情况：国家标准2025-09-01已执行，但地方配套2026-11-01才执行
-        # 这种情况下国家标准用新版，地方配套用旧版
-        if region.startswith("浙江") and project_date >= config["national_standard_date"]:
-            national_standard = "GB/T 50500-2024"
-            basis = f"{config['transition_rule']}；国家标准已执行但地方配套仍用旧版"
+    if project_date < local_date:
+        local_rule = rule.get("predecessor_id", "旧规则")
+        if not rule.get("bundle_national_with_local", True) and project_date >= national_date:
+            national_standard = current_nat["code"]
+            basis = f"{transition_rule}；国家标准已执行但地方配套仍用旧版"
         else:
-            # 江苏、上海：地方配套执行前，整体按原规定（国家标准也用旧版）
-            national_standard = "GB 50500-2013"
-            basis = f"{config['transition_rule']}"
+            national_standard = legacy_nat["code"]
+            basis = transition_rule
     else:
-        # 地方配套已执行，全部用新版
-        local_rule = config["new_local_rule"]
-        national_standard = "GB/T 50500-2024"
-        basis = f"{region}地方配套自{config['local_rule_date'].strftime('%Y-%m-%d')}起施行"
+        local_rule = rule["id"]
+        national_standard = current_nat["code"]
+        basis = f"{region}地方配套自{local_date.strftime('%Y-%m-%d')}起施行"
 
     return {
         "standard": national_standard,

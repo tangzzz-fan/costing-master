@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-地铁车站工程量快速估算工具
+[DEPRECATED / 越界停投] 地铁车站工程量快速估算工具
+
+范围声明（v1.2.0 起生效）：
+按 ROADMAP.md「范围纪律」，算量与工程量公式属于广联达等专业算量软件领地，
+本脚本已列为越界模块停止投入，不纳入核心 CI 阻断，仅保留作历史参考与兼容。
 
 功能：输入车站基本参数，一键估算主要工程量
 用途：辅助资深工程师快速判断清单工程量合理性
@@ -18,6 +22,7 @@
 日期：2026-10-19
 """
 
+import argparse
 import math
 from typing import Dict, Optional
 
@@ -433,6 +438,10 @@ def demo_tunnel_estimate():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="[DEPRECATED / 越界停投] 地铁车站与盾构区间工程量快速估算演示工具（按 ROADMAP.md v1.2.0 范围纪律不再投入，不替代图纸和算量软件）"
+    )
+    parser.parse_args()
     # 运行演示
     demo_station_estimate()
     print()

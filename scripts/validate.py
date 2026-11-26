@@ -20,8 +20,10 @@ Checks:
 from __future__ import annotations
 
 import csv
+import json
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -147,8 +149,8 @@ def check_frontmatter() -> None:
 def check_paths() -> None:
     path_pattern = re.compile(
         r"`((?:references|workflows|templates|input-specs|examples|test-cases|"
-        r"rules|hooks)/"
-        r"[^`\s]+\.md)`"
+        r"rules|hooks|docs|data)/"
+        r"[^`\s]+\.(?:md|json|csv))`"
     )
     link_pattern = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
 
@@ -341,12 +343,129 @@ def check_markdown() -> None:
                 index += 1
 
 
+def check_standards_registry() -> None:
+    registry_path = ROOT / "data" / "standards-registry.json"
+    index_path = ROOT / "references" / "standards-index.md"
+    if not registry_path.exists():
+        ERRORS.append("data/standards-registry.json: file is missing")
+        return
+    try:
+        registry = json.loads(read(registry_path))
+    except json.JSONDecodeError as exc:
+        ERRORS.append(f"data/standards-registry.json: invalid JSON ({exc})")
+        return
+
+    valid_tiers = {"core", "reference"}
+    valid_statuses = {"current", "superseded", "upcoming"}
+    entries_by_id: dict[str, dict] = {}
+    core_count = 0
+
+    for section in ("standards", "calculation_standards", "local_rules"):
+        items = registry.get(section)
+        if not isinstance(items, list) or not items:
+            ERRORS.append(f"data/standards-registry.json: '{section}' must be a non-empty list")
+            continue
+        for item in items:
+            entry_id = item.get("id")
+            if not isinstance(entry_id, str) or not entry_id:
+                ERRORS.append(f"data/standards-registry.json: missing id in {section}")
+                continue
+            if entry_id in entries_by_id:
+                ERRORS.append(f"data/standards-registry.json: duplicate id {entry_id}")
+            entries_by_id[entry_id] = item
+            tier = item.get("tier")
+            if tier not in valid_tiers:
+                ERRORS.append(f"data/standards-registry.json: {entry_id} invalid tier {tier!r}")
+            elif tier == "core":
+                core_count += 1
+            if item.get("status") not in valid_statuses:
+                ERRORS.append(
+                    f"data/standards-registry.json: {entry_id} invalid status {item.get('status')!r}"
+                )
+            for date_field in ("effective_date", "superseded_date", "last_reviewed", "approved_date"):
+                val = item.get(date_field)
+                if val is not None:
+                    try:
+                        date.fromisoformat(str(val))
+                    except ValueError:
+                        ERRORS.append(
+                            f"data/standards-registry.json: {entry_id}.{date_field} invalid date {val!r}"
+                        )
+
+    if core_count > 10:
+        ERRORS.append(
+            f"data/standards-registry.json: Tier-1 core count is {core_count} (limit 10)"
+        )
+
+    # Cross-check Markdown tables in references/standards-index.md against JSON registry
+    index_text = read(index_path)
+    md_rows: dict[str, list[str]] = {}
+    for line in index_text.splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) >= 3 and re.fullmatch(r"(?:S|C|L)\d{2}", cells[0]):
+            md_rows[cells[0]] = cells
+
+    for entry_id, cells in md_rows.items():
+        if entry_id not in entries_by_id:
+            ERRORS.append(
+                f"references/standards-index.md: {entry_id} missing from data/standards-registry.json"
+            )
+            continue
+        entry = entries_by_id[entry_id]
+        md_tier = cells[1]
+        if md_tier != entry.get("tier"):
+            ERRORS.append(
+                f"standards tier mismatch for {entry_id}: "
+                f"standards-index.md has {md_tier!r}, registry has {entry.get('tier')!r}"
+            )
+        row_text = " | ".join(cells)
+        effective_date = entry.get("effective_date")
+        if effective_date and effective_date not in row_text:
+            ERRORS.append(
+                f"standards effective_date mismatch for {entry_id}: "
+                f"registry has {effective_date}, not found in standards-index.md row"
+            )
+
+
+def check_feature_rules() -> None:
+    path = ROOT / "data" / "boq-feature-rules.json"
+    if not path.exists():
+        ERRORS.append("data/boq-feature-rules.json: file is missing")
+        return
+    try:
+        data = json.loads(read(path))
+    except json.JSONDecodeError as exc:
+        ERRORS.append(f"data/boq-feature-rules.json: invalid JSON ({exc})")
+        return
+    rules = data.get("rules", []) if isinstance(data, dict) else []
+    if len(rules) < 15:
+        ERRORS.append(f"data/boq-feature-rules.json: expected >= 15 rules, got {len(rules)}")
+    seen_ids: set[str] = set()
+    for rule in rules:
+        rid = rule.get("id", "")
+        if not rid or rid in seen_ids:
+            ERRORS.append(f"data/boq-feature-rules.json: missing or duplicate rule id {rid!r}")
+        seen_ids.add(rid)
+        if not rule.get("match_keywords") or not rule.get("required_elements"):
+            ERRORS.append(f"data/boq-feature-rules.json: {rid} missing match_keywords or required_elements")
+        for elem in rule.get("required_elements", []):
+            pattern = elem.get("pattern", "")
+            try:
+                re.compile(pattern)
+            except re.error as exc:
+                ERRORS.append(f"data/boq-feature-rules.json: {rid} invalid regex {pattern!r} ({exc})")
+
+
 def main() -> int:
     check_frontmatter()
     check_paths()
     check_skill_navigation()
     check_readme_tree()
     check_test_coverage()
+    check_standards_registry()
+    check_feature_rules()
     check_markdown()
     check_excel_templates()
     check_no_emoji()
